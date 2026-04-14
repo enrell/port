@@ -32,16 +32,18 @@ jobs:
           cat > dist/port-install.sh << 'INSTALLER'
           #!/usr/bin/env sh
           set -e
-          TARGET="$(uname -m)"
-          case "$TARGET" in
+          ARCH="$(uname -m)"
+          case "$ARCH" in
             x86_64) ASSET="port-x86_64-unknown-linux-gnu.tar.gz" ;;
             aarch64|arm64) ASSET="port-aarch64-unknown-linux-gnu.tar.gz" ;;
-            *) echo "Unsupported architecture: $TARGET" && exit 1 ;;
+            *) echo "Unsupported architecture: $ARCH" && exit 1 ;;
           esac
           TMPDIR=$(mktemp -d)
           curl -sL "https://github.com/enrell/port/releases/latest/download/$ASSET" -o "$TMPDIR/port.tar.gz"
           tar -xzf "$TMPDIR/port.tar.gz" -C "$TMPDIR"
-          install -Dm755 "$TMPDIR/port-$TARGET" "$HOME/.local/bin/port"
+          # The tarball extracts to a dir named after the binary (e.g. port-x86_64/)
+          EXTRACTED=$(find "$TMPDIR" -type f -name "port-*" ! -name "*.tar.gz" | head -1)
+          install -Dm755 "$EXTRACTED" "$HOME/.local/bin/port"
           rm -rf "$TMPDIR"
           echo "Installed port to ~/.local/bin/port"
           INSTALLER
@@ -58,19 +60,31 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # Build aarch64 and attach to the same release
+  # Build aarch64 via cross-compilation on x86_64 runner
   build-arm:
     runs-on: ubuntu-latest
-    needs: []
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      - name: Install cross-compilation toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-unknown-linux-gnu
+
+      - name: Configure cross-compilation
+        run: |
+          mkdir -p .cargo
+          cat > .cargo/config.toml << 'EOF'
+          [target.aarch64-unknown-linux-gnu]
+          linker = "aarch64-linux-gnu-gcc"
+          EOF
 
       - name: Build
         run: |
