@@ -2,6 +2,8 @@
 
 A simple TUI application for managing open network ports on Linux.
 
+<img width="941" height="508" alt="image" src="https://github.com/user-attachments/assets/b451f4b6-3154-4786-8855-0b833967502d" />
+
 ## Problem
 
 You run an application, the terminal crashes for some reason, and the server keeps running in the background. To find and kill the process responsible for that port, you need to run non-trivial commands. This tool solves that.
@@ -79,4 +81,4 @@ cargo run
 
 ## License
 
-MIT — see [LICENSE](LICENSE)
+[MIT](LICENSE)
