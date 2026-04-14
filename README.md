@@ -2,7 +2,7 @@
 
 A simple TUI application for managing open network ports on Linux.
 
-<img width="941" height="508" alt="image" src="https://github.com/user-attachments/assets/b451f4b6-3154-4786-8855-0b833967502d" />
+<img width="941" height="508" alt="image" src="https://github.com/user-attachments/assets/fae569fe-3343-4b09-87e7-a34792033778" />
 
 ## Problem
 
