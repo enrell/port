@@ -79,4 +79,4 @@ cargo run
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE)
