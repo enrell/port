@@ -80,16 +80,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install Rust (x86_64)
+      - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-unknown-linux-gnu
+          targets: x86_64-unknown-linux-gnu,aarch64-unknown-linux-gnu
 
-      - name: Install Rust (aarch64 toolchain)
+      - name: Install cross-compilation linker
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-aarch64-linux-gnu
-        shell: bash
 
       - name: Configure cross-compilation
         run: |
