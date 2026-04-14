@@ -2,80 +2,90 @@ name: Release
 
 on:
   push:
+    branches: [main]
+  pull_request:
+  push:
     tags:
       - 'v*'
 
-permissions:
-  contents: write
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
 
 jobs:
-  # Build x86_64 and create the GitHub Release
-  build-x86:
+  # On push to main: build and test
+  ci:
     runs-on: ubuntu-latest
+    if: github.event_name != 'tag'
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo registry
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build
+        run: cargo build --release
+
+      - name: Run tests
+        run: cargo test
+
+      - name: Generate version tag
+        id: version
+        run: |
+          # Count commits since last tag to create auto-incrementing version
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          COMMIT_COUNT=$(git rev-list --count HEAD ^$(git rev-parse $LAST_TAG) 2>/dev/null || echo "1")
+
+          # Parse last tag and increment
+          LAST_VER=$(echo $LAST_TAG | sed 's/^v//')
+          MAJOR=$(echo $LAST_VER | cut -d. -f1)
+          MINOR=$(echo $LAST_VER | cut -d. -f2)
+          PATCH=$(echo $LAST_VER | cut -d. -f3)
+
+          # Increment patch or start at v0.1.0
+          if [ "$COMMIT_COUNT" -gt 0 ]; then
+            PATCH=$((PATCH + 1))
+          fi
+
+          NEW_VERSION="v${MAJOR}.${MINOR}.${PATCH}"
+          echo "tag=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "count=$COMMIT_COUNT" >> $GITHUB_OUTPUT
+
+      - name: Create tag
+        if: steps.version.outputs.count != '0'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a ${{ steps.version.outputs.tag }} -m "Release ${{ steps.version.outputs.tag }}"
+          git push origin ${{ steps.version.outputs.tag }}
+
+  # On tag push: build and publish release
+  release:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Rust (x86_64)
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: x86_64-unknown-linux-gnu
 
-      - name: Build
-        run: |
-          cargo build --release --target x86_64-unknown-linux-gnu
-          mkdir -p dist
-          cp target/x86_64-unknown-linux-gnu/release/port dist/port-x86_64
-          tar -czf dist/port-x86_64-unknown-linux-gnu.tar.gz -C dist port-x86_64
-          # Create install script
-          cat > dist/port-install.sh << 'INSTALLER'
-          #!/usr/bin/env sh
-          set -e
-          ARCH="$(uname -m)"
-          case "$ARCH" in
-            x86_64) ASSET="port-x86_64-unknown-linux-gnu.tar.gz" ;;
-            aarch64|arm64) ASSET="port-aarch64-unknown-linux-gnu.tar.gz" ;;
-            *) echo "Unsupported architecture: $ARCH" && exit 1 ;;
-          esac
-          TMPDIR=$(mktemp -d)
-          curl -sL "https://github.com/enrell/port/releases/latest/download/$ASSET" -o "$TMPDIR/port.tar.gz"
-          tar -xzf "$TMPDIR/port.tar.gz" -C "$TMPDIR"
-          # The tarball extracts to a single file (port-x86_64)
-          install -Dm755 "$TMPDIR/port-x86_64" "$HOME/.local/bin/port"
-          rm -rf "$TMPDIR"
-          echo "Installed port to ~/.local/bin/port"
-          INSTALLER
-          chmod +x dist/port-install.sh
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-        with:
-          draft: true
-          prerelease: true
-          files: |
-            dist/port-x86_64-unknown-linux-gnu.tar.gz
-            dist/port-install.sh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # Build aarch64 via cross-compilation on x86_64 runner
-  build-arm:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Install cross-compilation toolchain
+      - name: Install Rust (aarch64 toolchain)
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-aarch64-linux-gnu
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: aarch64-unknown-linux-gnu
+        shell: bash
 
       - name: Configure cross-compilation
         run: |
@@ -85,18 +95,33 @@ jobs:
           linker = "aarch64-linux-gnu-gcc"
           EOF
 
-      - name: Build
+      - name: Build x86_64
+        run: |
+          cargo build --release --target x86_64-unknown-linux-gnu
+          mkdir -p dist
+          cp target/x86_64-unknown-linux-gnu/release/port dist/port-x86_64
+          tar -czf dist/port-x86_64-unknown-linux-gnu.tar.gz -C dist port-x86_64
+
+      - name: Build aarch64
         run: |
           cargo build --release --target aarch64-unknown-linux-gnu
-          mkdir -p dist
           cp target/aarch64-unknown-linux-gnu/release/port dist/port-aarch64
-          tar -czf port-aarch64-unknown-linux-gnu.tar.gz -C dist port-aarch64
+          tar -czf dist/port-aarch64-unknown-linux-gnu.tar.gz -C dist port-aarch64
 
-      - name: Upload to Release
+      - name: Include install script in dist
+        run: |
+          cp scripts/install.sh dist/
+          chmod +x dist/install.sh
+
+      - name: Create or update release
         uses: softprops/action-gh-release@v2
         with:
           draft: true
-          prerelease: true
-          files: port-aarch64-unknown-linux-gnu.tar.gz
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            dist/port-x86_64-unknown-linux-gnu.tar.gz
+            dist/port-aarch64-unknown-linux-gnu.tar.gz
+            dist/install.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

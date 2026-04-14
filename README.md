@@ -25,7 +25,7 @@ A Rust CLI with a terminal UI (TUI) that lists open ports, filters out system se
 ### Pre-built binaries (recommended)
 
 ```bash
-curl --proto '=https' --tlsv1.2 -LsSf https://github.com/enrell/port/releases/latest/download/port-install.sh | sh
+curl -LsSf https://raw.githubusercontent.com/enrell/port/main/scripts/install.sh | sh
 ```
 
 This downloads and installs the latest release for your architecture (x86_64 or aarch64).
