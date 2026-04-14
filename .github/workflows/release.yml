@@ -62,11 +62,14 @@ jobs:
 
       - name: Create tag
         if: steps.version.outputs.count != '0'
+        id: tag
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag -a ${{ steps.version.outputs.tag }} -m "Release ${{ steps.version.outputs.tag }}"
           git push origin ${{ steps.version.outputs.tag }}
+    outputs:
+      new_tag: ${{ steps.version.outputs.tag }}
 
   # Release job - triggered when a tag exists (pushed by CI)
   release:
@@ -119,6 +122,7 @@ jobs:
       - name: Create or update release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ needs.ci.outputs.new_tag }}
           draft: false
           prerelease: false
           generate_release_notes: true
