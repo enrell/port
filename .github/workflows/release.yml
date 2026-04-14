@@ -27,7 +27,7 @@ jobs:
           cargo build --release --target x86_64-unknown-linux-gnu
           mkdir -p dist
           cp target/x86_64-unknown-linux-gnu/release/port dist/port-x86_64
-          tar -czf port-x86_64-unknown-linux-gnu.tar.gz -C dist port-x86_64
+          tar -czf dist/port-x86_64-unknown-linux-gnu.tar.gz -C dist port-x86_64
           # Create install script
           cat > dist/port-install.sh << 'INSTALLER'
           #!/usr/bin/env sh
@@ -41,9 +41,8 @@ jobs:
           TMPDIR=$(mktemp -d)
           curl -sL "https://github.com/enrell/port/releases/latest/download/$ASSET" -o "$TMPDIR/port.tar.gz"
           tar -xzf "$TMPDIR/port.tar.gz" -C "$TMPDIR"
-          # The tarball extracts to a dir named after the binary (e.g. port-x86_64/)
-          EXTRACTED=$(find "$TMPDIR" -type f -name "port-*" ! -name "*.tar.gz" | head -1)
-          install -Dm755 "$EXTRACTED" "$HOME/.local/bin/port"
+          # The tarball extracts to a single file (port-x86_64)
+          install -Dm755 "$TMPDIR/port-x86_64" "$HOME/.local/bin/port"
           rm -rf "$TMPDIR"
           echo "Installed port to ~/.local/bin/port"
           INSTALLER
