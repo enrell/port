@@ -10,43 +10,49 @@ pub enum Mode {
 }
 
 pub struct App {
-    pub ports: Vec<PortInfo>,
-    pub filtered: Vec<usize>,
-    pub selected: usize,
-    pub search_query: String,
-    pub mode: Mode,
-    pub message: Option<String>,
-    pub should_quit: bool,
+ pub ports: Vec<PortInfo>,
+ pub filtered: Vec<usize>,
+ pub selected: usize,
+ pub search_query: String,
+ pub mode: Mode,
+ pub message: Option<String>,
+ pub should_quit: bool,
+ pub show_all: bool,
 }
 
 impl App {
-    pub fn new() -> Self {
-        let mut app = Self {
-            ports: Vec::new(),
-            filtered: Vec::new(),
-            selected: 0,
-            search_query: String::new(),
-            mode: Mode::Normal,
-            message: None,
-            should_quit: false,
-        };
-        let _ = app.refresh_ports();
-        app
-    }
+ pub fn new(show_all: bool) -> Self {
+ let mut app = Self {
+ ports: Vec::new(),
+ filtered: Vec::new(),
+ selected: 0,
+ search_query: String::new(),
+ mode: Mode::Normal,
+ message: None,
+ should_quit: false,
+ show_all,
+ };
+ let _ = app.refresh_ports();
+ app
+ }
 
-    pub fn refresh_ports(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        match get_open_ports() {
-            Ok(all_ports) => {
-                self.ports = all_ports
-                    .into_iter()
-                    .filter(|p| should_include_port(p.port, &p.process_name))
-                    .collect();
-                self.apply_filter();
-                Ok(())
-            }
-            Err(e) => Err(Box::new(e)),
-        }
-    }
+ pub fn refresh_ports(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+ match get_open_ports() {
+ Ok(all_ports) => {
+ if self.show_all {
+ self.ports = all_ports;
+ } else {
+ self.ports = all_ports
+ .into_iter()
+ .filter(|p| should_include_port(p.port, &p.process_name))
+ .collect();
+ }
+ self.apply_filter();
+ Ok(())
+ }
+ Err(e) => Err(Box::new(e)),
+ }
+ }
 
     fn apply_filter(&mut self) {
         self.filtered = if self.search_query.is_empty() {
@@ -138,16 +144,16 @@ mod tests {
         }
     }
 
-    #[test]
-    fn test_navigation() {
-        let mut app = App::new();
-        app.ports = vec![
-            create_test_port(3000, 100, "test1"),
-            create_test_port(3001, 101, "test2"),
-            create_test_port(3002, 102, "test3"),
-        ];
-        app.filtered = vec![0, 1, 2];
-        app.selected = 0;
+#[test]
+ fn test_navigation() {
+ let mut app = App::new(false);
+ app.ports = vec![
+ create_test_port(3000, 100, "test1"),
+ create_test_port(3001, 101, "test2"),
+ create_test_port(3002, 102, "test3"),
+ ];
+ app.filtered = vec![0, 1, 2];
+ app.selected = 0;
 
         app.next();
         assert_eq!(app.selected, 1);
@@ -168,15 +174,15 @@ mod tests {
         assert_eq!(app.selected, 0);
     }
 
-    #[test]
-    fn test_search_filter() {
-        let mut app = App::new();
-        app.ports = vec![
-            create_test_port(8080, 100, "firefox"),
-            create_test_port(9999, 101, "chrome"),
-            create_test_port(7777, 102, "firefox"),
-        ];
-        app.filtered = vec![0, 1, 2];
+#[test]
+ fn test_search_filter() {
+ let mut app = App::new(false);
+ app.ports = vec![
+ create_test_port(8080, 100, "firefox"),
+ create_test_port(9999, 101, "chrome"),
+ create_test_port(7777, 102, "firefox"),
+ ];
+ app.filtered = vec![0, 1, 2];
 
         app.update_search("fire".to_string());
         assert_eq!(app.filtered.len(), 2);
@@ -188,11 +194,11 @@ mod tests {
         assert_eq!(app.filtered.len(), 3);
     }
 
-    #[test]
-    fn test_mode_transitions() {
-        let mut app = App::new();
+#[test]
+ fn test_mode_transitions() {
+ let mut app = App::new(false);
 
-        assert!(matches!(app.mode, Mode::Normal));
+ assert!(matches!(app.mode, Mode::Normal));
 
         app.enter_search_mode();
         assert!(matches!(app.mode, Mode::Search));
@@ -205,7 +211,30 @@ mod tests {
         app.confirm_kill();
         assert!(matches!(app.mode, Mode::ConfirmKill { pid: 100, .. }));
 
-        app.cancel_modal();
-        assert!(matches!(app.mode, Mode::Normal));
-    }
+ app.cancel_modal();
+ assert!(matches!(app.mode, Mode::Normal));
+ }
+
+ #[test]
+ fn test_show_all_flag() {
+ let mut app_filtered = App::new(false);
+ app_filtered.ports = vec![
+ create_test_port(22, 100, "sshd"),
+ create_test_port(9999, 101, "myapp"),
+ ];
+ app_filtered.filtered = vec![0, 1];
+
+ app_filtered.update_search("".to_string());
+ assert_eq!(app_filtered.ports.len(), 2);
+
+ let mut app_all = App::new(true);
+ app_all.ports = vec![
+ create_test_port(22, 100, "sshd"),
+ create_test_port(9999, 101, "myapp"),
+ ];
+ app_all.filtered = vec![0, 1];
+
+ assert_eq!(app_all.ports.len(), 2);
+ assert!(app_all.show_all);
+ }
 }

@@ -22,17 +22,26 @@ A Rust CLI with a terminal UI (TUI) that lists open ports, filters out system se
 
 ## Installation
 
+### Pre-built binaries (recommended)
+
 ```bash
-cd port
+curl --proto '=https' --tlsv1.2 -LsSf https://github.com/enrell/port/releases/latest/download/port-install.sh | sh
+```
+
+This downloads and installs the latest release for your architecture (x86_64 or aarch64).
+
+### From source
+
+```bash
 cargo build --release
-sudo cp target/release/port /usr/local/bin/
+install -Dm755 target/release/port ~/.local/bin/port
 ```
 
 ## Usage
 
-Simply run:
 ```bash
-port
+port              # Show user-owned ports only
+port --all        # Show all ports including system services
 ```
 
 ### Controls

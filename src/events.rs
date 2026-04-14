@@ -114,19 +114,19 @@ mod tests {
         crossterm::event::KeyEvent::from(KeyCode::Char(c))
     }
 
-    #[test]
-    fn test_quit_with_q() {
-        let mut app = App::new();
-        let should_quit = handle_normal_mode(&mut app, make_char_key('q'));
-        assert!(should_quit);
-        assert!(app.should_quit);
-    }
+ #[test]
+ fn test_quit_with_q() {
+ let mut app = App::new(false);
+ let should_quit = handle_normal_mode(&mut app, make_char_key('q'));
+ assert!(should_quit);
+ assert!(app.should_quit);
+ }
 
-    #[test]
-    fn test_navigation() {
-        let mut app = App::new();
-        app.filtered = vec![0, 1, 2];
-        app.selected = 0;
+ #[test]
+ fn test_navigation() {
+ let mut app = App::new(false);
+ app.filtered = vec![0, 1, 2];
+ app.selected = 0;
 
         handle_normal_mode(&mut app, make_char_key('j'));
         assert_eq!(app.selected, 1);
@@ -141,56 +141,56 @@ mod tests {
         assert_eq!(app.selected, 0);
     }
 
-    #[test]
-    fn test_search_mode_activation() {
-        let mut app = App::new();
-        handle_normal_mode(&mut app, make_char_key('/'));
-        assert!(matches!(app.mode, crate::app::Mode::Search));
-    }
+ #[test]
+ fn test_search_mode_activation() {
+ let mut app = App::new(false);
+ handle_normal_mode(&mut app, make_char_key('/'));
+ assert!(matches!(app.mode, crate::app::Mode::Search));
+ }
 
-    #[test]
-    fn test_search_mode_exit() {
-        let mut app = App::new();
-        app.mode = crate::app::Mode::Search;
-        handle_search_mode(&mut app, make_key(KeyCode::Esc));
-        assert!(matches!(app.mode, crate::app::Mode::Normal));
-    }
+ #[test]
+ fn test_search_mode_exit() {
+ let mut app = App::new(false);
+ app.mode = crate::app::Mode::Search;
+ handle_search_mode(&mut app, make_key(KeyCode::Esc));
+ assert!(matches!(app.mode, crate::app::Mode::Normal));
+ }
 
-    #[test]
-    fn test_search_typing() {
-        let mut app = App::new();
-        app.mode = crate::app::Mode::Search;
+ #[test]
+ fn test_search_typing() {
+ let mut app = App::new(false);
+ app.mode = crate::app::Mode::Search;
 
-        handle_search_mode(&mut app, make_char_key('t'));
-        handle_search_mode(&mut app, make_char_key('e'));
-        handle_search_mode(&mut app, make_char_key('s'));
-        handle_search_mode(&mut app, make_char_key('t'));
+ handle_search_mode(&mut app, make_char_key('t'));
+ handle_search_mode(&mut app, make_char_key('e'));
+ handle_search_mode(&mut app, make_char_key('s'));
+ handle_search_mode(&mut app, make_char_key('t'));
 
-        assert_eq!(app.search_query, "test");
-    }
+ assert_eq!(app.search_query, "test");
+ }
 
-    #[test]
-    fn test_confirm_mode_yes() {
-        let mut app = App::new();
-        app.ports = vec![PortInfo {
-            port: 8080,
-            pid: 99999,
-            process_name: "nonexistent".to_string(),
-            process_path: "/bin/test".to_string(),
-        }];
-        app.filtered = vec![0];
-        app.confirm_kill();
+ #[test]
+ fn test_confirm_mode_yes() {
+ let mut app = App::new(false);
+ app.ports = vec![PortInfo {
+ port: 8080,
+ pid: 99999,
+ process_name: "nonexistent".to_string(),
+ process_path: "/bin/test".to_string(),
+ }];
+ app.filtered = vec![0];
+ app.confirm_kill();
 
-        assert!(matches!(app.mode, crate::app::Mode::ConfirmKill { .. }));
+ assert!(matches!(app.mode, crate::app::Mode::ConfirmKill { .. }));
 
-        handle_confirm_mode(&mut app, make_char_key('y'));
-        assert!(matches!(app.mode, crate::app::Mode::Normal));
-    }
+ handle_confirm_mode(&mut app, make_char_key('y'));
+ assert!(matches!(app.mode, crate::app::Mode::Normal));
+ }
 
-    #[test]
-    fn test_confirm_mode_no() {
-        let mut app = App::new();
-        app.ports = vec![PortInfo {
+ #[test]
+ fn test_confirm_mode_no() {
+ let mut app = App::new(false);
+ app.ports = vec![PortInfo {
             port: 8080,
             pid: 99999,
             process_name: "nonexistent".to_string(),

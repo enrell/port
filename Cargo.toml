@@ -2,12 +2,17 @@
 name = "port"
 version = "0.1.0"
 edition = "2021"
+description = "A TUI tool for managing open network ports on Linux"
+repository = "git@github.com:enrell/port.git"
+license = "MIT"
+readme = "README.md"
 
 [dependencies]
 ratatui = "0.28"
 crossterm = "0.28"
 sysinfo = "0.30"
 libc = "0.2"
+clap = { version = "4.5", features = ["derive"] }
 
 [lib]
 name = "port"
@@ -16,3 +21,22 @@ path = "src/lib.rs"
 [[bin]]
 name = "port"
 path = "src/main.rs"
+
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"
+
+# Config for 'dist'
+[workspace.metadata.dist]
+# Target platforms to build apps for (Rust target-triple syntax)
+targets = ["aarch64-unknown-linux-gnu", "x86_64-unknown-linux-gnu"]
+# The installers to generate for each app
+installers = []
+# The preferred dist version to use in CI (Cargo.toml SemVer syntax)
+cargo-dist-version = "0.24.0"
+# CI backends to support
+ci = "github"
+# Where to host releases
+hosting = "github"
+
