@@ -1,0 +1,18 @@
+[package]
+name = "port"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ratatui = "0.28"
+crossterm = "0.28"
+sysinfo = "0.30"
+libc = "0.2"
+
+[lib]
+name = "port"
+path = "src/lib.rs"
+
+[[bin]]
+name = "port"
+path = "src/main.rs"

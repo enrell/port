@@ -1,0 +1,82 @@
+# port
+
+A simple TUI application for managing open network ports on Linux.
+
+## Problem
+
+You run an application, the terminal crashes for some reason, and the server keeps running in the background. To find and kill the process responsible for that port, you need to run non-trivial commands. This tool solves that.
+
+## Solution
+
+A Rust CLI with a terminal UI (TUI) that lists open ports, filters out system services, and lets you kill processes with a few keystrokes.
+
+## Features
+
+- **List open ports** — Shows TCP ports with process name and executable path
+- **Filter system ports** — Excludes SSH (22), HTTP (80/443), Docker containers, systemd, and other system services
+- **Search** — Live filter by process name or port number
+- **Kill** — Enter to open confirmation modal, then confirm to force kill (SIGKILL)
+- **Keyboard-driven** — No mouse needed
+
+## Installation
+
+```bash
+cd port
+cargo build --release
+sudo cp target/release/port /usr/local/bin/
+```
+
+## Usage
+
+Simply run:
+```bash
+port
+```
+
+### Controls
+
+| Key | Action |
+|-----|--------|
+| `↑` / `k` | Move up |
+| `↓` / `j` | Move down |
+| `/` or `i` | Enter search mode |
+| `Enter` | Open kill confirmation modal |
+| `y` | Confirm kill (in modal) |
+| `n` or `Esc` | Cancel (in modal) |
+| `r` | Refresh port list |
+| `q` or `Ctrl+C` | Quit |
+
+## Architecture
+
+```
+src/
+├── main.rs      # Entry point
+├── app.rs       # State management
+├── ui.rs        # Ratatui rendering
+├── events.rs    # Input handling
+├── ports.rs     # Port discovery (/proc/net/tcp)
+├── process.rs   # Process operations (kill)
+├── filter.rs    # System port filtering
+└── lib.rs       # Module exports
+```
+
+## Development
+
+Run tests:
+```bash
+cargo test
+```
+
+Run in debug mode:
+```bash
+cargo run
+```
+
+## Requirements
+
+- Linux kernel (reads from /proc filesystem)
+- Rust toolchain
+
+## License
+
+MIT
