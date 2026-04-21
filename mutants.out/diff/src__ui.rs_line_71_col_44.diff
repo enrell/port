@@ -1,0 +1,21 @@
+--- src/ui.rs
++++ replace == with != in render_table
+@@ -63,17 +63,17 @@
+         );
+ 
+     let rows: Vec<Row> = app
+         .filtered
+         .iter()
+         .enumerate()
+         .map(|(idx, &port_idx)| {
+             let port = &app.ports[port_idx];
+-            let is_selected = app.selected == idx;
++            let is_selected = app.selected != /* ~ changed by cargo-mutants ~ */ idx;
+             let style = if is_selected {
+                 Style::default()
+                     .bg(Color::DarkGray)
+                     .fg(Color::Cyan)
+                     .add_modifier(Modifier::BOLD)
+             } else {
+                 Style::default()
+             };

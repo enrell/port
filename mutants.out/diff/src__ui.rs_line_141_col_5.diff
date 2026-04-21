@@ -1,0 +1,31 @@
+--- src/ui.rs
++++ replace render_footer with ()
+@@ -133,27 +133,17 @@
+             .alignment(Alignment::Center)
+             .wrap(Wrap { trim: true });
+         frame.render_widget(Clear, area);
+         frame.render_widget(popup, area);
+     }
+ }
+ 
+ fn render_footer(frame: &mut Frame, app: &App, area: Rect) {
+-    let hints = match app.mode {
+-        Mode::Normal => "q:quit /:search j/k:navigate Enter:kill r:refresh",
+-        Mode::Search => "Esc:cancel Enter:done",
+-        Mode::ConfirmKill { .. } => "y:confirm n:cancel",
+-    };
+-
+-    let footer = Paragraph::new(hints)
+-        .style(Style::default().fg(Color::Gray))
+-        .alignment(Alignment::Center);
+-
+-    frame.render_widget(footer, area);
++    () /* ~ changed by cargo-mutants ~ */
+ }
+ 
+ fn render_confirm_modal(frame: &mut Frame, pid: &u32, name: &str) {
+     let area = centered_rect(50, 20, frame.area());
+     let block = Block::default()
+         .borders(Borders::ALL)
+         .border_style(Style::default().fg(Color::Red))
+         .title("Confirm Kill")

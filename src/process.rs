@@ -1,4 +1,5 @@
 use std::io;
+use std::process::Command;
 
 pub fn kill_process(pid: u32) -> io::Result<()> {
     let result = unsafe { libc::kill(pid as libc::pid_t, libc::SIGKILL) };
@@ -7,6 +8,19 @@ pub fn kill_process(pid: u32) -> io::Result<()> {
     } else {
         Err(io::Error::last_os_error())
     }
+}
+
+pub fn kill_docker_container(container_id: &str) -> io::Result<()> {
+    let output = Command::new("docker")
+        .args(["stop", "-t", "0", container_id])
+        .output()?;
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(io::Error::new(io::ErrorKind::Other, format!("docker stop failed: {}", stderr)));
+    }
+
+    Ok(())
 }
 
 pub fn format_error(e: &io::Error) -> String {

@@ -1,0 +1,32 @@
+--- src/app.rs
++++ replace App::execute_kill with ()
+@@ -97,28 +97,17 @@
+                     pid: port.pid,
+                     name: port.process_name.clone(),
+                 };
+             }
+         }
+     }
+ 
+     pub fn execute_kill(&mut self) {
+-        if let Mode::ConfirmKill { pid, .. } = self.mode {
+-            match kill_process(pid) {
+-                Ok(_) => {
+-                    self.message = Some(format!("Killed process {}", pid));
+-                    let _ = self.refresh_ports();
+-                }
+-                Err(e) => {
+-                    self.message = Some(format_error(&e));
+-                }
+-            }
+-        }
+-        self.mode = Mode::Normal;
++        () /* ~ changed by cargo-mutants ~ */
+     }
+ 
+     pub fn cancel_modal(&mut self) {
+         self.mode = Mode::Normal;
+     }
+ }
+ 
+ #[cfg(test)]

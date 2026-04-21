@@ -173,11 +173,12 @@ mod tests {
  fn test_confirm_mode_yes() {
  let mut app = App::new();
  app.ports = vec![PortInfo {
- port: 8080,
- pid: 99999,
- process_name: "nonexistent".to_string(),
- process_path: "/bin/test".to_string(),
- }];
+            port: 8080,
+            pid: 99999,
+            process_name: "nonexistent".to_string(),
+            process_path: "/bin/test".to_string(),
+            container_id: None,
+        }];
  app.filtered = vec![0];
  app.confirm_kill();
 
@@ -195,6 +196,7 @@ mod tests {
             pid: 99999,
             process_name: "nonexistent".to_string(),
             process_path: "/bin/test".to_string(),
+            container_id: None,
         }];
         app.filtered = vec![0];
         app.confirm_kill();

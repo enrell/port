@@ -1,11 +1,16 @@
 use crate::ports::{get_open_ports, PortInfo};
 use crate::process::{format_error, kill_process};
+use crate::process::kill_docker_container;
 
 #[derive(Debug, Clone)]
 pub enum Mode {
     Normal,
     Search,
-    ConfirmKill { pid: u32, name: String },
+    ConfirmKill {
+        pid: u32,
+        name: String,
+        container_id: Option<String>,
+    },
 }
 
 pub struct App {
@@ -96,16 +101,28 @@ impl App {
                 self.mode = Mode::ConfirmKill {
                     pid: port.pid,
                     name: port.process_name.clone(),
+                    container_id: port.container_id.clone(),
                 };
             }
         }
     }
 
     pub fn execute_kill(&mut self) {
-        if let Mode::ConfirmKill { pid, .. } = self.mode {
-            match kill_process(pid) {
+        if let Mode::ConfirmKill { pid, name: _, container_id } = &self.mode {
+            let container_id = container_id.clone();
+            let result = if let Some(ref id) = container_id {
+                kill_docker_container(id)
+            } else {
+                kill_process(*pid)
+            };
+
+            match result {
                 Ok(_) => {
-                    self.message = Some(format!("Killed process {}", pid));
+                    self.message = Some(if container_id.is_some() {
+                        format!("Stopped container on port")
+                    } else {
+                        format!("Killed process {}", pid)
+                    });
                     let _ = self.refresh_ports();
                 }
                 Err(e) => {
@@ -131,6 +148,7 @@ mod tests {
             pid,
             process_name: name.to_string(),
             process_path: "/bin/test".to_string(),
+            container_id: None,
         }
     }
 
@@ -203,17 +221,5 @@ mod tests {
 
  app.cancel_modal();
  assert!(matches!(app.mode, Mode::Normal));
- }
-
- fn test_show_all_flag() {
- let mut app = App::new();
- app.ports = vec![
- create_test_port(22, 100, "sshd"),
- create_test_port(9999, 101, "myapp"),
- ];
- app.filtered = vec![0, 1];
-
- app.update_search("".to_string());
- assert_eq!(app.ports.len(), 2);
  }
 }

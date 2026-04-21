@@ -1,0 +1,139 @@
+src/main.rs:31:2: replace main -> io::Result<ExitCode> with Ok(Default::default())
+src/main.rs:65:2: replace kill_by_port -> io::Result<()> with Ok(())
+src/main.rs:66:60: replace == with != in kill_by_port
+src/app.rs:37:2: replace App::refresh_ports -> Result<(), Box<dyn std::error::Error>> with Ok(())
+src/events.rs:7:5: replace handle -> io::Result<bool> with Ok(true)
+src/events.rs:7:5: replace handle -> io::Result<bool> with Ok(false)
+src/events.rs:9:25: replace == with != in handle
+src/events.rs:18:5: replace handle_key_event -> bool with true
+src/events.rs:18:5: replace handle_key_event -> bool with false
+src/events.rs:47:9: delete match arm KeyCode::Enter in handle_normal_mode
+src/events.rs:51:9: delete match arm KeyCode::Esc in handle_normal_mode
+src/events.rs:54:9: delete match arm KeyCode::Char('r') in handle_normal_mode
+src/events.rs:31:31: replace match guard key.modifiers.contains(KeyModifiers::CONTROL) with true in handle_normal_mode
+src/events.rs:31:31: replace match guard key.modifiers.contains(KeyModifiers::CONTROL) with false in handle_normal_mode
+src/events.rs:68:9: delete match arm KeyCode::Enter in handle_search_mode
+src/events.rs:72:9: delete match arm KeyCode::Backspace in handle_search_mode
+src/ports.rs:14:5: replace get_open_ports -> io::Result<Vec<PortInfo>> with Ok(vec![])
+src/ports.rs:25:5: replace build_inode_pid_map -> io::Result<HashMap<u64, u32>> with Ok(HashMap::new())
+src/ports.rs:25:5: replace build_inode_pid_map -> io::Result<HashMap<u64, u32>> with Ok(HashMap::from_iter([(0, 0)]))
+src/ports.rs:25:5: replace build_inode_pid_map -> io::Result<HashMap<u64, u32>> with Ok(HashMap::from_iter([(0, 1)]))
+src/ports.rs:25:5: replace build_inode_pid_map -> io::Result<HashMap<u64, u32>> with Ok(HashMap::from_iter([(1, 0)]))
+src/ports.rs:25:5: replace build_inode_pid_map -> io::Result<HashMap<u64, u32>> with Ok(HashMap::from_iter([(1, 1)]))
+src/ports.rs:59:5: replace parse_tcp_file -> io::Result<()> with Ok(())
+src/ports.rs:65:24: replace < with == in parse_tcp_file
+src/ports.rs:65:24: replace < with > in parse_tcp_file
+src/ports.rs:65:24: replace < with <= in parse_tcp_file
+src/ports.rs:74:18: replace != with == in parse_tcp_file
+src/ports.rs:85:18: replace == with != in parse_tcp_file
+src/ports.rs:115:5: replace get_process_info -> (String, String) with (String::new(), String::new())
+src/ports.rs:115:5: replace get_process_info -> (String, String) with (String::new(), "xyzzy".into())
+src/ports.rs:115:5: replace get_process_info -> (String, String) with ("xyzzy".into(), String::new())
+src/ports.rs:115:5: replace get_process_info -> (String, String) with ("xyzzy".into(), "xyzzy".into())
+src/process.rs:13:25: replace == with != in format_error
+src/process.rs:15:32: replace == with != in format_error
+src/ui.rs:12:5: replace render with ()
+src/ui.rs:32:5: replace render_header with ()
+src/ui.rs:34:15: delete ! in render_header
+src/ui.rs:58:5: replace render_table with ()
+src/ui.rs:71:44: replace == with != in render_table
+src/ui.rs:109:8: delete ! in render_table
+src/ui.rs:115:43: replace < with == in render_table
+src/ui.rs:115:43: replace < with > in render_table
+src/ui.rs:115:43: replace < with <= in render_table
+src/ui.rs:115:59: replace + with - in render_table
+src/ui.rs:115:59: replace + with * in render_table
+src/ui.rs:115:75: replace / with % in render_table
+src/ui.rs:115:75: replace / with * in render_table
+src/ui.rs:118:60: replace / with % in render_table
+src/ui.rs:118:60: replace / with * in render_table
+src/ui.rs:141:5: replace render_footer with ()
+src/ui.rs:155:5: replace render_confirm_modal with ()
+src/ui.rs:187:5: replace centered_rect -> Rect with Default::default()
+src/ui.rs:190:54: replace / with % in centered_rect
+src/ui.rs:190:54: replace / with * in centered_rect
+src/ui.rs:190:41: replace - with + in centered_rect
+src/ui.rs:190:41: replace - with / in centered_rect
+src/ui.rs:192:54: replace / with % in centered_rect
+src/ui.rs:192:54: replace / with * in centered_rect
+src/ui.rs:192:41: replace - with + in centered_rect
+src/ui.rs:192:41: replace - with / in centered_rect
+src/ui.rs:199:54: replace / with % in centered_rect
+src/ui.rs:199:54: replace / with * in centered_rect
+src/ui.rs:199:41: replace - with + in centered_rect
+src/ui.rs:199:41: replace - with / in centered_rect
+src/ui.rs:201:54: replace / with % in centered_rect
+src/ui.rs:201:54: replace / with * in centered_rect
+src/ui.rs:201:41: replace - with + in centered_rect
+src/ui.rs:201:41: replace - with / in centered_rect
+src/ui.rs:207:5: replace truncate -> String with String::new()
+src/ui.rs:207:5: replace truncate -> String with "xyzzy".into()
+src/ui.rs:207:16: replace <= with > in truncate
+src/app.rs:37:2: replace App::refresh_ports -> Result<(), Box<dyn std::error::Error>> with Ok(())
+src/events.rs:7:5: replace handle -> io::Result<bool> with Ok(true)
+src/events.rs:7:5: replace handle -> io::Result<bool> with Ok(false)
+src/events.rs:9:25: replace == with != in handle
+src/events.rs:18:5: replace handle_key_event -> bool with true
+src/events.rs:18:5: replace handle_key_event -> bool with false
+src/events.rs:47:9: delete match arm KeyCode::Enter in handle_normal_mode
+src/events.rs:51:9: delete match arm KeyCode::Esc in handle_normal_mode
+src/events.rs:54:9: delete match arm KeyCode::Char('r') in handle_normal_mode
+src/events.rs:31:31: replace match guard key.modifiers.contains(KeyModifiers::CONTROL) with true in handle_normal_mode
+src/events.rs:31:31: replace match guard key.modifiers.contains(KeyModifiers::CONTROL) with false in handle_normal_mode
+src/events.rs:68:9: delete match arm KeyCode::Enter in handle_search_mode
+src/events.rs:72:9: delete match arm KeyCode::Backspace in handle_search_mode
+src/ports.rs:14:5: replace get_open_ports -> io::Result<Vec<PortInfo>> with Ok(vec![])
+src/ports.rs:25:5: replace build_inode_pid_map -> io::Result<HashMap<u64, u32>> with Ok(HashMap::new())
+src/ports.rs:25:5: replace build_inode_pid_map -> io::Result<HashMap<u64, u32>> with Ok(HashMap::from_iter([(0, 0)]))
+src/ports.rs:25:5: replace build_inode_pid_map -> io::Result<HashMap<u64, u32>> with Ok(HashMap::from_iter([(0, 1)]))
+src/ports.rs:25:5: replace build_inode_pid_map -> io::Result<HashMap<u64, u32>> with Ok(HashMap::from_iter([(1, 0)]))
+src/ports.rs:25:5: replace build_inode_pid_map -> io::Result<HashMap<u64, u32>> with Ok(HashMap::from_iter([(1, 1)]))
+src/ports.rs:59:5: replace parse_tcp_file -> io::Result<()> with Ok(())
+src/ports.rs:65:24: replace < with == in parse_tcp_file
+src/ports.rs:65:24: replace < with > in parse_tcp_file
+src/ports.rs:65:24: replace < with <= in parse_tcp_file
+src/ports.rs:74:18: replace != with == in parse_tcp_file
+src/ports.rs:85:18: replace == with != in parse_tcp_file
+src/ports.rs:115:5: replace get_process_info -> (String, String) with (String::new(), String::new())
+src/ports.rs:115:5: replace get_process_info -> (String, String) with (String::new(), "xyzzy".into())
+src/ports.rs:115:5: replace get_process_info -> (String, String) with ("xyzzy".into(), String::new())
+src/ports.rs:115:5: replace get_process_info -> (String, String) with ("xyzzy".into(), "xyzzy".into())
+src/process.rs:13:25: replace == with != in format_error
+src/process.rs:15:32: replace == with != in format_error
+src/ui.rs:12:5: replace render with ()
+src/ui.rs:32:5: replace render_header with ()
+src/ui.rs:34:15: delete ! in render_header
+src/ui.rs:58:5: replace render_table with ()
+src/ui.rs:71:44: replace == with != in render_table
+src/ui.rs:109:8: delete ! in render_table
+src/ui.rs:115:43: replace < with == in render_table
+src/ui.rs:115:43: replace < with > in render_table
+src/ui.rs:115:43: replace < with <= in render_table
+src/ui.rs:115:59: replace + with - in render_table
+src/ui.rs:115:59: replace + with * in render_table
+src/ui.rs:115:75: replace / with % in render_table
+src/ui.rs:115:75: replace / with * in render_table
+src/ui.rs:118:60: replace / with % in render_table
+src/ui.rs:118:60: replace / with * in render_table
+src/ui.rs:141:5: replace render_footer with ()
+src/ui.rs:155:5: replace render_confirm_modal with ()
+src/ui.rs:187:5: replace centered_rect -> Rect with Default::default()
+src/ui.rs:190:54: replace / with % in centered_rect
+src/ui.rs:190:54: replace / with * in centered_rect
+src/ui.rs:190:41: replace - with + in centered_rect
+src/ui.rs:190:41: replace - with / in centered_rect
+src/ui.rs:192:54: replace / with % in centered_rect
+src/ui.rs:192:54: replace / with * in centered_rect
+src/ui.rs:192:41: replace - with + in centered_rect
+src/ui.rs:192:41: replace - with / in centered_rect
+src/ui.rs:199:54: replace / with % in centered_rect
+src/ui.rs:199:54: replace / with * in centered_rect
+src/ui.rs:199:41: replace - with + in centered_rect
+src/ui.rs:199:41: replace - with / in centered_rect
+src/ui.rs:201:54: replace / with % in centered_rect
+src/ui.rs:201:54: replace / with * in centered_rect
+src/ui.rs:201:41: replace - with + in centered_rect
+src/ui.rs:201:41: replace - with / in centered_rect
+src/ui.rs:207:5: replace truncate -> String with String::new()
+src/ui.rs:207:5: replace truncate -> String with "xyzzy".into()
+src/ui.rs:207:16: replace <= with > in truncate

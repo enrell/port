@@ -1,0 +1,21 @@
+--- src/app.rs
++++ replace || with && in App::apply_filter
+@@ -50,17 +50,17 @@
+         } else {
+             let query = self.search_query.to_lowercase();
+             self.ports
+                 .iter()
+                 .enumerate()
+                 .filter(|(_, p)| {
+                     p.port.to_string().contains(&query)
+                         || p.process_name.to_lowercase().contains(&query)
+-                        || p.process_path.to_lowercase().contains(&query)
++                        && /* ~ changed by cargo-mutants ~ */ p.process_path.to_lowercase().contains(&query)
+                 })
+                 .map(|(i, _)| i)
+                 .collect()
+         };
+         self.selected = self.selected.min(self.filtered.len().saturating_sub(1));
+     }
+ 
+     pub fn update_search(&mut self, query: String) {

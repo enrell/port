@@ -23,7 +23,7 @@ pub fn render(frame: &mut Frame, app: &App) {
     render_table(frame, app, chunks[1]);
     render_footer(frame, app, chunks[2]);
 
-    if let Mode::ConfirmKill { pid, name } = &app.mode {
+    if let Mode::ConfirmKill { pid, name, container_id: _ } = &app.mode {
         render_confirm_modal(frame, pid, name);
     }
 }

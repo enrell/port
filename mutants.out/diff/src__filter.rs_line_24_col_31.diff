@@ -1,0 +1,21 @@
+--- src/filter.rs
++++ delete ! in should_include_port
+@@ -16,17 +16,17 @@
+ }
+ 
+ pub fn is_blocked_process(name: &str) -> bool {
+     let name_lower = name.to_lowercase();
+     BLOCKED_PROCESSES.iter().any(|blocked| name_lower.contains(blocked))
+ }
+ 
+ pub fn should_include_port(port: u16, process_name: &str) -> bool {
+-    !is_blocked_port(port) && !is_blocked_process(process_name)
++    !is_blocked_port(port) &&  /* ~ changed by cargo-mutants ~ */is_blocked_process(process_name)
+ }
+ 
+ #[cfg(test)]
+ mod tests {
+     use super::*;
+ 
+     #[test]
+     fn test_blocked_ports() {

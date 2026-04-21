@@ -1,0 +1,37 @@
+--- src/ui.rs
++++ replace render with ()
+@@ -4,33 +4,17 @@
+     text::{Line, Span, Text},
+     widgets::{Block, Borders, Clear, Paragraph, Row, Table, Wrap},
+     Frame,
+ };
+ 
+ use crate::app::{App, Mode};
+ 
+ pub fn render(frame: &mut Frame, app: &App) {
+-    let chunks = Layout::default()
+-        .direction(Direction::Vertical)
+-        .margin(1)
+-        .constraints([
+-            Constraint::Length(3),
+-            Constraint::Min(0),
+-            Constraint::Length(1),
+-        ])
+-        .split(frame.area());
+-
+-    render_header(frame, app, chunks[0]);
+-    render_table(frame, app, chunks[1]);
+-    render_footer(frame, app, chunks[2]);
+-
+-    if let Mode::ConfirmKill { pid, name } = &app.mode {
+-        render_confirm_modal(frame, pid, name);
+-    }
++    () /* ~ changed by cargo-mutants ~ */
+ }
+ 
+ fn render_header(frame: &mut Frame, app: &App, area: Rect) {
+     let search_text = if matches!(app.mode, Mode::Search) {
+         format!("Search: {}", app.search_query)
+     } else if !app.search_query.is_empty() {
+         format!("Search: {} (press / to edit)", app.search_query)
+     } else {

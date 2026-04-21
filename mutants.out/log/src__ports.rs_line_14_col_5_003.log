@@ -1,0 +1,143 @@
+
+*** src/ports.rs:14:5: replace get_open_ports -> io::Result<Vec<PortInfo>> with Ok(vec![Default::default()])
+
+*** mutation diff:
+--- src/ports.rs
++++ replace get_open_ports -> io::Result<Vec<PortInfo>> with Ok(vec![Default::default()])
+@@ -6,24 +6,17 @@
+ pub struct PortInfo {
+     pub port: u16,
+     pub pid: u32,
+     pub process_name: String,
+     pub process_path: String,
+ }
+ 
+ pub fn get_open_ports() -> io::Result<Vec<PortInfo>> {
+-    let mut ports = Vec::new();
+-    let mut inode_pid_map = build_inode_pid_map()?;
+-
+-    parse_tcp_file("/proc/net/tcp", &mut ports, &mut inode_pid_map, false)?;
+-    let _ = parse_tcp_file("/proc/net/tcp6", &mut ports, &mut inode_pid_map, true);
+-
+-    ports.sort_by(|a, b| a.port.cmp(&b.port));
+-    Ok(ports)
++    Ok(vec![Default::default()]) /* ~ changed by cargo-mutants ~ */
+ }
+ 
+ fn build_inode_pid_map() -> io::Result<HashMap<u64, u32>> {
+     let mut map = HashMap::new();
+ 
+     for entry in fs::read_dir("/proc")? {
+         let entry = entry?;
+         let name = entry.file_name().to_string_lossy().to_string();
+
+
+*** /home/kokoro/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo test --no-run --verbose --package=port@0.1.0
+       Fresh unicode-ident v1.0.24
+       Fresh proc-macro2 v1.0.106
+       Fresh strsim v0.11.1
+       Fresh cfg-if v1.0.4
+       Fresh either v1.15.0
+       Fresh ident_case v1.0.1
+       Fresh heck v0.5.0
+       Fresh libc v0.2.185
+       Fresh quote v1.0.45
+       Fresh smallvec v1.15.1
+       Fresh log v0.4.29
+       Fresh scopeguard v1.2.0
+       Fresh utf8parse v0.2.2
+       Fresh colorchoice v1.0.5
+       Fresh allocator-api2 v0.2.21
+       Fresh equivalent v1.0.2
+       Fresh foldhash v0.1.5
+       Fresh bitflags v2.11.0
+       Fresh syn v2.0.117
+       Fresh crossbeam-utils v0.8.21
+       Fresh errno v0.3.14
+       Fresh rustversion v1.0.22
+       Fresh lock_api v0.4.14
+       Fresh anstyle-parse v1.0.0
+       Fresh parking_lot_core v0.9.12
+       Fresh mio v1.2.0
+       Fresh anstyle-query v1.1.5
+       Fresh is_terminal_polyfill v1.70.2
+       Fresh anstyle v1.0.14
+       Fresh linux-raw-sys v0.4.15
+       Fresh hashbrown v0.15.5
+       Fresh darling_core v0.23.0
+       Fresh crossbeam-epoch v0.9.18
+       Fresh signal-hook-registry v1.4.8
+       Fresh anstream v1.0.0
+       Fresh strum_macros v0.26.4
+       Fresh parking_lot v0.12.5
+       Fresh rustix v0.38.44
+       Fresh castaway v0.2.4
+       Fresh itertools v0.13.0
+       Fresh indoc v2.0.7
+       Fresh static_assertions v1.1.0
+       Fresh unicode-segmentation v1.13.2
+       Fresh unicode-width v0.1.14
+       Fresh itoa v1.0.18
+       Fresh ryu v1.0.23
+       Fresh darling_macro v0.23.0
+       Fresh signal-hook v0.3.18
+       Fresh crossbeam-deque v0.8.6
+       Fresh clap_lex v1.1.0
+       Fresh compact_str v0.8.1
+       Fresh unicode-truncate v1.1.0
+       Fresh paste v1.0.15
+       Fresh strum v0.26.3
+       Fresh lru v0.12.5
+       Fresh clap_derive v4.6.0
+       Fresh once_cell v1.21.4
+       Fresh cassowary v0.3.0
+       Fresh signal-hook-mio v0.2.5
+       Fresh darling v0.23.0
+       Fresh rayon-core v1.13.0
+       Fresh clap_builder v4.6.0
+       Fresh instability v0.3.12
+       Fresh rayon v1.12.0
+       Fresh crossterm v0.28.1
+       Fresh clap v4.6.0
+       Fresh ratatui v0.28.1
+       Fresh sysinfo v0.30.13
+       Dirty port v0.1.0 (/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp): the file `src/ports.rs` has changed (1776735969.772679585s, 688002428ns after last build at 1776735969.084677157s)
+   Compiling port v0.1.0 (/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp)
+     Running `/home/kokoro/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc --crate-name port --edition=2021 src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --emit=dep-info,link -C embed-bitcode=no -C debuginfo=2 --test --check-cfg 'cfg(docsrs,test)' --check-cfg 'cfg(feature, values())' -C metadata=2252ddf7dcedca69 -C extra-filename=-e96da08cae1479da --out-dir /home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps -C incremental=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/incremental -L dependency=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps --extern clap=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libclap-1a0933b3d4b7ca77.rlib --extern crossterm=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libcrossterm-9c60b41a2f27ca84.rlib --extern libc=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/liblibc-5a1706567bedcee1.rlib --extern ratatui=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libratatui-cda975374c03fcad.rlib --extern sysinfo=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libsysinfo-7faff9ae12eff885.rlib`
+     Running `/home/kokoro/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc --crate-name port --edition=2021 src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type lib --emit=dep-info,metadata,link -C embed-bitcode=no -C debuginfo=2 --check-cfg 'cfg(docsrs,test)' --check-cfg 'cfg(feature, values())' -C metadata=2079e7455b219bb9 -C extra-filename=-2d6b9a71341d4c3a --out-dir /home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps -C incremental=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/incremental -L dependency=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps --extern clap=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libclap-1a0933b3d4b7ca77.rmeta --extern crossterm=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libcrossterm-9c60b41a2f27ca84.rmeta --extern libc=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/liblibc-5a1706567bedcee1.rmeta --extern ratatui=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libratatui-cda975374c03fcad.rmeta --extern sysinfo=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libsysinfo-7faff9ae12eff885.rmeta`
+error[E0277]: the trait bound `ports::PortInfo: Default` is not satisfied
+  --> src/ports.rs:14:13
+   |
+14 |     Ok(vec![Default::default()]) /* ~ changed by cargo-mutants ~ */
+   |             ^^^^^^^^^^^^^^^^^^ the trait `Default` is not implemented for `ports::PortInfo`
+   |
+help: consider annotating `ports::PortInfo` with `#[derive(Default)]`
+   |
+ 6 + #[derive(Default)]
+ 7 | pub struct PortInfo {
+   |
+
+For more information about this error, try `rustc --explain E0277`.
+error[E0277]: the trait bound `PortInfo: Default` is not satisfied
+  --> src/ports.rs:14:13
+   |
+14 |     Ok(vec![Default::default()]) /* ~ changed by cargo-mutants ~ */
+   |             ^^^^^^^^^^^^^^^^^^ the trait `Default` is not implemented for `PortInfo`
+   |
+help: consider annotating `PortInfo` with `#[derive(Default)]`
+   |
+ 6 + #[derive(Default)]
+ 7 | pub struct PortInfo {
+   |
+
+error: could not compile `port` (lib test) due to 1 previous error
+
+Caused by:
+  process didn't exit successfully: `/home/kokoro/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc --crate-name port --edition=2021 src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --emit=dep-info,link -C embed-bitcode=no -C debuginfo=2 --test --check-cfg 'cfg(docsrs,test)' --check-cfg 'cfg(feature, values())' -C metadata=2252ddf7dcedca69 -C extra-filename=-e96da08cae1479da --out-dir /home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps -C incremental=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/incremental -L dependency=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps --extern clap=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libclap-1a0933b3d4b7ca77.rlib --extern crossterm=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libcrossterm-9c60b41a2f27ca84.rlib --extern libc=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/liblibc-5a1706567bedcee1.rlib --extern ratatui=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libratatui-cda975374c03fcad.rlib --extern sysinfo=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libsysinfo-7faff9ae12eff885.rlib` (exit status: 1)
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `port` (lib) due to 1 previous error
+
+Caused by:
+  process didn't exit successfully: `/home/kokoro/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc --crate-name port --edition=2021 src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type lib --emit=dep-info,metadata,link -C embed-bitcode=no -C debuginfo=2 --check-cfg 'cfg(docsrs,test)' --check-cfg 'cfg(feature, values())' -C metadata=2079e7455b219bb9 -C extra-filename=-2d6b9a71341d4c3a --out-dir /home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps -C incremental=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/incremental -L dependency=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps --extern clap=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libclap-1a0933b3d4b7ca77.rmeta --extern crossterm=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libcrossterm-9c60b41a2f27ca84.rmeta --extern libc=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/liblibc-5a1706567bedcee1.rmeta --extern ratatui=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libratatui-cda975374c03fcad.rmeta --extern sysinfo=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libsysinfo-7faff9ae12eff885.rmeta` (exit status: 1)
+
+*** result: Failure(101)

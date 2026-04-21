@@ -1,0 +1,21 @@
+--- src/ports.rs
++++ replace < with == in parse_tcp_file
+@@ -57,17 +57,17 @@
+     _is_ipv6: bool,
+ ) -> io::Result<()> {
+     let file = fs::File::open(path)?;
+     let reader = BufReader::new(file);
+ 
+     for line in reader.lines().skip(1) {
+         let line = line?;
+         let parts: Vec<&str> = line.split_whitespace().collect();
+-        if parts.len() < 10 {
++        if parts.len() == /* ~ changed by cargo-mutants ~ */ 10 {
+             continue;
+         }
+ 
+         let _local_addr = parts[1];
+         let _rem_addr = parts[2];
+         let state = parts[3];
+         let inode_str = parts[9];
+ 

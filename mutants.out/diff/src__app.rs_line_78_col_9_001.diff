@@ -1,0 +1,23 @@
+--- src/app.rs
++++ replace App::previous with ()
+@@ -70,19 +70,17 @@
+ 
+     pub fn next(&mut self) {
+         if !self.filtered.is_empty() && self.selected < self.filtered.len() - 1 {
+             self.selected += 1;
+         }
+     }
+ 
+     pub fn previous(&mut self) {
+-        if self.selected > 0 {
+-            self.selected -= 1;
+-        }
++        () /* ~ changed by cargo-mutants ~ */
+     }
+ 
+     pub fn enter_search_mode(&mut self) {
+         self.mode = Mode::Search;
+         self.search_query.clear();
+         self.apply_filter();
+     }
+ 

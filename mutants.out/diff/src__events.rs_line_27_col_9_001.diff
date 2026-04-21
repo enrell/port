@@ -1,0 +1,24 @@
+--- src/events.rs
++++ delete match arm KeyCode::Char('q') | KeyCode::Char('Q') in handle_normal_mode
+@@ -19,20 +19,17 @@
+         Mode::Normal => handle_normal_mode(app, key),
+         Mode::Search => handle_search_mode(app, key),
+         Mode::ConfirmKill { .. } => handle_confirm_mode(app, key),
+     }
+ }
+ 
+ fn handle_normal_mode(app: &mut App, key: KeyEvent) -> bool {
+     match key.code {
+-        KeyCode::Char('q') | KeyCode::Char('Q') => {
+-            app.should_quit = true;
+-            true
+-        }
++         /* ~ changed by cargo-mutants ~ */
+         KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+             app.should_quit = true;
+             true
+         }
+         KeyCode::Char('/') | KeyCode::Char('i') => {
+             app.enter_search_mode();
+             false
+         }

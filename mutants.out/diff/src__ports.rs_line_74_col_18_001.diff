@@ -1,0 +1,21 @@
+--- src/ports.rs
++++ replace != with == in parse_tcp_file
+@@ -66,17 +66,17 @@
+             continue;
+         }
+ 
+         let _local_addr = parts[1];
+         let _rem_addr = parts[2];
+         let state = parts[3];
+         let inode_str = parts[9];
+ 
+-        if state != "0A" {
++        if state == /* ~ changed by cargo-mutants ~ */ "0A" {
+             continue;
+         }
+ 
+         let port = parse_port(_local_addr);
+ 
+         let inode: u64 = match inode_str.parse() {
+             Ok(n) => n,
+             Err(_) => continue,

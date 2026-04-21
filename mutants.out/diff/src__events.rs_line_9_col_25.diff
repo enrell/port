@@ -1,0 +1,21 @@
+--- src/events.rs
++++ replace == with != in handle
+@@ -1,17 +1,17 @@
+ use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
+ use std::io;
+ 
+ use crate::app::{App, Mode};
+ 
+ pub fn handle(app: &mut App) -> io::Result<bool> {
+     if event::poll(std::time::Duration::from_millis(100))? {
+         if let Event::Key(key) = event::read()? {
+-            if key.kind == KeyEventKind::Press {
++            if key.kind != /* ~ changed by cargo-mutants ~ */ KeyEventKind::Press {
+                 return Ok(handle_key_event(app, key));
+             }
+         }
+     }
+     Ok(false)
+ }
+ 
+ fn handle_key_event(app: &mut App, key: KeyEvent) -> bool {

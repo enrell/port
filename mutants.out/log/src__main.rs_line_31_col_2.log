@@ -1,0 +1,459 @@
+
+*** src/main.rs:31:2: replace main -> io::Result<ExitCode> with Ok(Default::default())
+
+*** mutation diff:
+--- src/main.rs
++++ replace main -> io::Result<ExitCode> with Ok(Default::default())
+@@ -23,47 +23,17 @@
+ #[command(about = "TUI port manager for Linux")]
+ struct Args {
+  #[arg(short, long)]
+  tui: bool,
+  port: Option<u16>,
+ }
+ 
+ fn main() -> io::Result<ExitCode> {
+- let args = Args::parse();
+-
+- if let Some(port) = args.port {
+- if let Err(e) = kill_by_port(port) {
+- eprintln!("Error: {}", e);
+- return Ok(ExitCode::FAILURE);
+- }
+- return Ok(ExitCode::SUCCESS);
+- }
+-
+- terminal::enable_raw_mode()?;
+- io::stdout().execute(EnterAlternateScreen)?;
+- let backend = CrosstermBackend::new(io::stdout());
+- let mut terminal = Terminal::new(backend)?;
+- let mut app = App::new();
+-
+- loop {
+- terminal.draw(|frame| ui::render(frame, &app))?;
+-
+- if events::handle(&mut app)? {
+- break;
+- }
+-
+- if app.should_quit {
+- break;
+- }
+- }
+-
+- terminal::disable_raw_mode()?;
+- io::stdout().execute(LeaveAlternateScreen)?;
+- Ok(ExitCode::SUCCESS)
++ Ok(Default::default()) /* ~ changed by cargo-mutants ~ */
+ }
+ 
+ fn kill_by_port(port: u16) -> io::Result<()> {
+  let all_ports = get_open_ports()?;
+  if let Some(port_info) = all_ports.iter().find(|p| p.port == port) {
+  return process::kill_process(port_info.pid);
+  }
+  Err(io::Error::new(io::ErrorKind::NotFound, format!("No process found on port {}", port)))
+
+
+*** /home/kokoro/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo test --no-run --verbose --package=port@0.1.0
+       Fresh unicode-ident v1.0.24
+       Fresh strsim v0.11.1
+       Fresh cfg-if v1.0.4
+       Fresh heck v0.5.0
+       Fresh either v1.15.0
+       Fresh ident_case v1.0.1
+       Fresh scopeguard v1.2.0
+       Fresh smallvec v1.15.1
+       Fresh log v0.4.29
+       Fresh proc-macro2 v1.0.106
+       Fresh libc v0.2.185
+       Fresh utf8parse v0.2.2
+       Fresh lock_api v0.4.14
+       Fresh colorchoice v1.0.5
+       Fresh foldhash v0.1.5
+       Fresh linux-raw-sys v0.4.15
+       Fresh is_terminal_polyfill v1.70.2
+       Fresh anstyle v1.0.14
+       Fresh anstyle-query v1.1.5
+       Fresh quote v1.0.45
+       Fresh errno v0.3.14
+       Fresh crossbeam-utils v0.8.21
+       Fresh rustversion v1.0.22
+       Fresh mio v1.2.0
+       Fresh parking_lot_core v0.9.12
+       Fresh anstyle-parse v1.0.0
+       Fresh bitflags v2.11.0
+       Fresh allocator-api2 v0.2.21
+       Fresh equivalent v1.0.2
+       Fresh itertools v0.13.0
+       Fresh static_assertions v1.1.0
+       Fresh unicode-width v0.1.14
+       Fresh unicode-segmentation v1.13.2
+       Fresh ryu v1.0.23
+       Fresh syn v2.0.117
+       Fresh signal-hook-registry v1.4.8
+       Fresh crossbeam-epoch v0.9.18
+       Fresh parking_lot v0.12.5
+       Fresh anstream v1.0.0
+       Fresh rustix v0.38.44
+       Fresh hashbrown v0.15.5
+       Fresh castaway v0.2.4
+       Fresh clap_lex v1.1.0
+       Fresh itoa v1.0.18
+       Fresh indoc v2.0.7
+       Fresh unicode-truncate v1.1.0
+       Fresh paste v1.0.15
+       Fresh cassowary v0.3.0
+       Fresh once_cell v1.21.4
+       Fresh darling_core v0.23.0
+       Fresh signal-hook v0.3.18
+       Fresh crossbeam-deque v0.8.6
+       Fresh strum_macros v0.26.4
+       Fresh lru v0.12.5
+       Fresh clap_builder v4.6.0
+       Fresh clap_derive v4.6.0
+       Fresh compact_str v0.8.1
+       Fresh darling_macro v0.23.0
+       Fresh signal-hook-mio v0.2.5
+       Fresh rayon-core v1.13.0
+       Fresh strum v0.26.3
+       Fresh clap v4.6.0
+       Fresh darling v0.23.0
+       Fresh crossterm v0.28.1
+       Fresh rayon v1.12.0
+       Fresh instability v0.3.12
+       Fresh sysinfo v0.30.13
+       Fresh ratatui v0.28.1
+       Dirty port v0.1.0 (/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp): the file `src/main.rs` has changed (1776735848.194250852s, 1s after last build at 1776735847.425248143s)
+   Compiling port v0.1.0 (/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp)
+     Running `/home/kokoro/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc --crate-name port --edition=2021 src/main.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --emit=dep-info,link -C embed-bitcode=no -C debuginfo=2 --test --check-cfg 'cfg(docsrs,test)' --check-cfg 'cfg(feature, values())' -C metadata=369196a560ef3dd3 -C extra-filename=-1bd188e359d4c6c8 --out-dir /home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps -C incremental=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/incremental -L dependency=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps --extern clap=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libclap-1a0933b3d4b7ca77.rlib --extern crossterm=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libcrossterm-9c60b41a2f27ca84.rlib --extern libc=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/liblibc-5a1706567bedcee1.rlib --extern port=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libport-2d6b9a71341d4c3a.rlib --extern ratatui=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libratatui-cda975374c03fcad.rlib --extern sysinfo=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libsysinfo-7faff9ae12eff885.rlib`
+warning: unused imports: `EnterAlternateScreen`, `ExecutableCommand`, `LeaveAlternateScreen`, and `self`
+ --> src/main.rs:4:13
+  |
+4 |  terminal::{self, EnterAlternateScreen, LeaveAlternateScreen},
+  |             ^^^^  ^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^
+5 |  ExecutableCommand,
+  |  ^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `ratatui::backend::CrosstermBackend`
+ --> src/main.rs:7:5
+  |
+7 | use ratatui::backend::CrosstermBackend;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `ratatui::Terminal`
+ --> src/main.rs:8:5
+  |
+8 | use ratatui::Terminal;
+  |     ^^^^^^^^^^^^^^^^^
+
+warning: unused import: `app::App`
+  --> src/main.rs:18:5
+   |
+18 | use app::App;
+   |     ^^^^^^^^
+
+warning: function `kill_by_port` is never used
+  --> src/main.rs:34:4
+   |
+34 | fn kill_by_port(port: u16) -> io::Result<()> {
+   |    ^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `name` is never read
+ --> src/app.rs:8:29
+  |
+8 |     ConfirmKill { pid: u32, name: String },
+  |     -----------             ^^^^
+  |     |
+  |     field in this variant
+  |
+  = note: `Mode` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: function `handle` is never used
+ --> src/events.rs:6:8
+  |
+6 | pub fn handle(app: &mut App) -> io::Result<bool> {
+  |        ^^^^^^
+
+warning: function `handle_key_event` is never used
+  --> src/events.rs:17:4
+   |
+17 | fn handle_key_event(app: &mut App, key: KeyEvent) -> bool {
+   |    ^^^^^^^^^^^^^^^^
+
+warning: function `render` is never used
+  --> src/ui.rs:11:8
+   |
+11 | pub fn render(frame: &mut Frame, app: &App) {
+   |        ^^^^^^
+
+warning: function `render_header` is never used
+  --> src/ui.rs:31:4
+   |
+31 | fn render_header(frame: &mut Frame, app: &App, area: Rect) {
+   |    ^^^^^^^^^^^^^
+
+warning: function `render_table` is never used
+  --> src/ui.rs:57:4
+   |
+57 | fn render_table(frame: &mut Frame, app: &App, area: Rect) {
+   |    ^^^^^^^^^^^^
+
+warning: function `render_footer` is never used
+   --> src/ui.rs:140:4
+    |
+140 | fn render_footer(frame: &mut Frame, app: &App, area: Rect) {
+    |    ^^^^^^^^^^^^^
+
+warning: function `render_confirm_modal` is never used
+   --> src/ui.rs:154:4
+    |
+154 | fn render_confirm_modal(frame: &mut Frame, pid: &u32, name: &str) {
+    |    ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `centered_rect` is never used
+   --> src/ui.rs:186:4
+    |
+186 | fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
+    |    ^^^^^^^^^^^^^
+
+warning: function `truncate` is never used
+   --> src/ui.rs:206:4
+    |
+206 | fn truncate(s: &str, max_len: usize) -> String {
+    |    ^^^^^^^^
+
+warning: `port` (bin "port" test) generated 15 warnings (run `cargo fix --bin "port" -p port --tests` to apply 4 suggestions)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.28s
+  Executable `/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/port-e96da08cae1479da`
+  Executable `/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/port-1bd188e359d4c6c8`
+
+*** result: Success
+
+*** /home/kokoro/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo test --verbose --package=port@0.1.0
+       Fresh unicode-ident v1.0.24
+       Fresh strsim v0.11.1
+       Fresh cfg-if v1.0.4
+       Fresh proc-macro2 v1.0.106
+       Fresh libc v0.2.185
+       Fresh either v1.15.0
+       Fresh heck v0.5.0
+       Fresh ident_case v1.0.1
+       Fresh utf8parse v0.2.2
+       Fresh log v0.4.29
+       Fresh smallvec v1.15.1
+       Fresh scopeguard v1.2.0
+       Fresh colorchoice v1.0.5
+       Fresh linux-raw-sys v0.4.15
+       Fresh quote v1.0.45
+       Fresh errno v0.3.14
+       Fresh rustversion v1.0.22
+       Fresh crossbeam-utils v0.8.21
+       Fresh anstyle-parse v1.0.0
+       Fresh mio v1.2.0
+       Fresh lock_api v0.4.14
+       Fresh anstyle v1.0.14
+       Fresh foldhash v0.1.5
+       Fresh allocator-api2 v0.2.21
+       Fresh bitflags v2.11.0
+       Fresh equivalent v1.0.2
+       Fresh syn v2.0.117
+       Fresh signal-hook-registry v1.4.8
+       Fresh crossbeam-epoch v0.9.18
+       Fresh parking_lot_core v0.9.12
+       Fresh is_terminal_polyfill v1.70.2
+       Fresh anstyle-query v1.1.5
+       Fresh rustix v0.38.44
+       Fresh hashbrown v0.15.5
+       Fresh castaway v0.2.4
+       Fresh itertools v0.13.0
+       Fresh indoc v2.0.7
+       Fresh static_assertions v1.1.0
+       Fresh itoa v1.0.18
+       Fresh unicode-segmentation v1.13.2
+       Fresh ryu v1.0.23
+       Fresh darling_core v0.23.0
+       Fresh crossbeam-deque v0.8.6
+       Fresh signal-hook v0.3.18
+       Fresh anstream v1.0.0
+       Fresh strum_macros v0.26.4
+       Fresh parking_lot v0.12.5
+       Fresh clap_lex v1.1.0
+       Fresh unicode-width v0.1.14
+       Fresh compact_str v0.8.1
+       Fresh clap_derive v4.6.0
+       Fresh lru v0.12.5
+       Fresh paste v1.0.15
+       Fresh once_cell v1.21.4
+       Fresh cassowary v0.3.0
+       Fresh darling_macro v0.23.0
+       Fresh signal-hook-mio v0.2.5
+       Fresh rayon-core v1.13.0
+       Fresh unicode-truncate v1.1.0
+       Fresh strum v0.26.3
+       Fresh clap_builder v4.6.0
+       Fresh darling v0.23.0
+       Fresh crossterm v0.28.1
+       Fresh rayon v1.12.0
+       Fresh clap v4.6.0
+       Fresh instability v0.3.12
+       Fresh sysinfo v0.30.13
+       Fresh ratatui v0.28.1
+       Fresh port v0.1.0 (/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp)
+warning: unused imports: `EnterAlternateScreen`, `ExecutableCommand`, `LeaveAlternateScreen`, and `self`
+ --> src/main.rs:4:13
+  |
+4 |  terminal::{self, EnterAlternateScreen, LeaveAlternateScreen},
+  |             ^^^^  ^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^
+5 |  ExecutableCommand,
+  |  ^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `ratatui::backend::CrosstermBackend`
+ --> src/main.rs:7:5
+  |
+7 | use ratatui::backend::CrosstermBackend;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `ratatui::Terminal`
+ --> src/main.rs:8:5
+  |
+8 | use ratatui::Terminal;
+  |     ^^^^^^^^^^^^^^^^^
+
+warning: unused import: `app::App`
+  --> src/main.rs:18:5
+   |
+18 | use app::App;
+   |     ^^^^^^^^
+
+warning: function `kill_by_port` is never used
+  --> src/main.rs:34:4
+   |
+34 | fn kill_by_port(port: u16) -> io::Result<()> {
+   |    ^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `name` is never read
+ --> src/app.rs:8:29
+  |
+8 |     ConfirmKill { pid: u32, name: String },
+  |     -----------             ^^^^
+  |     |
+  |     field in this variant
+  |
+  = note: `Mode` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: function `handle` is never used
+ --> src/events.rs:6:8
+  |
+6 | pub fn handle(app: &mut App) -> io::Result<bool> {
+  |        ^^^^^^
+
+warning: function `handle_key_event` is never used
+  --> src/events.rs:17:4
+   |
+17 | fn handle_key_event(app: &mut App, key: KeyEvent) -> bool {
+   |    ^^^^^^^^^^^^^^^^
+
+warning: function `render` is never used
+  --> src/ui.rs:11:8
+   |
+11 | pub fn render(frame: &mut Frame, app: &App) {
+   |        ^^^^^^
+
+warning: function `render_header` is never used
+  --> src/ui.rs:31:4
+   |
+31 | fn render_header(frame: &mut Frame, app: &App, area: Rect) {
+   |    ^^^^^^^^^^^^^
+
+warning: function `render_table` is never used
+  --> src/ui.rs:57:4
+   |
+57 | fn render_table(frame: &mut Frame, app: &App, area: Rect) {
+   |    ^^^^^^^^^^^^
+
+warning: function `render_footer` is never used
+   --> src/ui.rs:140:4
+    |
+140 | fn render_footer(frame: &mut Frame, app: &App, area: Rect) {
+    |    ^^^^^^^^^^^^^
+
+warning: function `render_confirm_modal` is never used
+   --> src/ui.rs:154:4
+    |
+154 | fn render_confirm_modal(frame: &mut Frame, pid: &u32, name: &str) {
+    |    ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `centered_rect` is never used
+   --> src/ui.rs:186:4
+    |
+186 | fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
+    |    ^^^^^^^^^^^^^
+
+warning: function `truncate` is never used
+   --> src/ui.rs:206:4
+    |
+206 | fn truncate(s: &str, max_len: usize) -> String {
+    |    ^^^^^^^^
+
+warning: `port` (bin "port" test) generated 15 warnings (run `cargo fix --bin "port" -p port --tests` to apply 4 suggestions)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s
+     Running `/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/port-e96da08cae1479da`
+
+running 15 tests
+test filter::tests::test_blocked_processes ... ok
+test ports::tests::test_parse_port ... ok
+test filter::tests::test_blocked_ports ... ok
+test process::tests::test_kill_nonexistent_process ... ok
+test filter::tests::test_should_include_port ... ok
+test events::tests::test_search_typing ... ok
+test events::tests::test_confirm_mode_yes ... ok
+test events::tests::test_search_mode_activation ... ok
+test events::tests::test_confirm_mode_no ... ok
+test events::tests::test_search_mode_exit ... ok
+test app::tests::test_search_filter ... ok
+test events::tests::test_navigation ... ok
+test app::tests::test_mode_transitions ... ok
+test events::tests::test_quit_with_q ... ok
+test app::tests::test_navigation ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running `/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/port-1bd188e359d4c6c8`
+
+running 15 tests
+test filter::tests::test_blocked_ports ... ok
+test ports::tests::test_parse_port ... ok
+test filter::tests::test_blocked_processes ... ok
+test process::tests::test_kill_nonexistent_process ... ok
+test filter::tests::test_should_include_port ... ok
+test app::tests::test_mode_transitions ... ok
+test app::tests::test_search_filter ... ok
+test app::tests::test_navigation ... ok
+test events::tests::test_navigation ... ok
+test events::tests::test_search_mode_activation ... ok
+test events::tests::test_search_typing ... ok
+test events::tests::test_quit_with_q ... ok
+test events::tests::test_search_mode_exit ... ok
+test events::tests::test_confirm_mode_no ... ok
+test events::tests::test_confirm_mode_yes ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+   Doc-tests port
+     Running `/home/kokoro/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustdoc --edition=2021 --crate-type lib --color auto --crate-name port --test src/lib.rs --test-run-directory /home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp --extern clap=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libclap-1a0933b3d4b7ca77.rlib --extern crossterm=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libcrossterm-9c60b41a2f27ca84.rlib --extern libc=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/liblibc-5a1706567bedcee1.rlib --extern port=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libport-2d6b9a71341d4c3a.rlib --extern ratatui=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libratatui-cda975374c03fcad.rlib --extern sysinfo=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libsysinfo-7faff9ae12eff885.rlib -L dependency=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps -C embed-bitcode=no --check-cfg 'cfg(docsrs,test)' --check-cfg 'cfg(feature, values())' --error-format human`
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+*** result: Success

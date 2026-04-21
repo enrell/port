@@ -1,0 +1,46 @@
+--- src/ports.rs
++++ replace build_inode_pid_map -> io::Result<HashMap<u64, u32>> with Ok(HashMap::from_iter([(0, 0)]))
+@@ -17,42 +17,17 @@
+     parse_tcp_file("/proc/net/tcp", &mut ports, &mut inode_pid_map, false)?;
+     let _ = parse_tcp_file("/proc/net/tcp6", &mut ports, &mut inode_pid_map, true);
+ 
+     ports.sort_by(|a, b| a.port.cmp(&b.port));
+     Ok(ports)
+ }
+ 
+ fn build_inode_pid_map() -> io::Result<HashMap<u64, u32>> {
+-    let mut map = HashMap::new();
+-
+-    for entry in fs::read_dir("/proc")? {
+-        let entry = entry?;
+-        let name = entry.file_name().to_string_lossy().to_string();
+-
+-        if let Ok(pid) = name.parse::<u32>() {
+-            let fd_dir = format!("/proc/{}/fd", pid);
+-            if let Ok(entries) = fs::read_dir(&fd_dir) {
+-                for fd_entry in entries.flatten() {
+-                    if let Ok(link) = fs::read_link(fd_entry.path()) {
+-                        let link_str = link.to_string_lossy();
+-                        if link_str.starts_with("socket:[") {
+-                            if let Some(inode) = link_str.strip_prefix("socket:[").and_then(|s| s.strip_suffix("]")) {
+-                                if let Ok(inode_num) = inode.parse::<u64>() {
+-                                    map.insert(inode_num, pid);
+-                                }
+-                            }
+-                        }
+-                    }
+-                }
+-            }
+-        }
+-    }
+-
+-    Ok(map)
++    Ok(HashMap::from_iter([(0, 0)])) /* ~ changed by cargo-mutants ~ */
+ }
+ 
+ fn parse_tcp_file(
+     path: &str,
+     ports: &mut Vec<PortInfo>,
+     inode_pid_map: &mut HashMap<u64, u32>,
+     _is_ipv6: bool,
+ ) -> io::Result<()> {

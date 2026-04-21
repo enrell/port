@@ -1,0 +1,21 @@
+--- src/ui.rs
++++ replace < with == in render_table
+@@ -107,17 +107,17 @@
+     frame.render_widget(table, area);
+ 
+     if !app.filtered.is_empty() {
+         if let Mode::Normal = app.mode {
+             let highlight_idx = app.selected;
+             let first_visible = 0usize;
+             let visible_count = area.height.saturating_sub(3) as usize;
+ 
+-            let offset = if highlight_idx < first_visible + visible_count / 2 {
++            let offset = if highlight_idx == /* ~ changed by cargo-mutants ~ */ first_visible + visible_count / 2 {
+                 0
+             } else {
+                 highlight_idx.saturating_sub(visible_count / 2)
+             };
+ 
+             let _ = offset;
+         }
+     }

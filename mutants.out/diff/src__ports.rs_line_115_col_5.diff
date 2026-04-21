@@ -1,0 +1,32 @@
+--- src/ports.rs
++++ replace get_process_info -> (String, String) with (String::new(), String::new())
+@@ -107,28 +107,17 @@
+         if let Ok(port) = u16::from_str_radix(port_hex, 16) {
+             return port;
+         }
+     }
+     0
+ }
+ 
+ fn get_process_info(pid: u32) -> (String, String) {
+-    let exe_link = format!("/proc/{}/exe", pid);
+-    let cmdline_path = format!("/proc/{}/comm", pid);
+-
+-    let path = fs::read_link(&exe_link)
+-        .map(|p| p.to_string_lossy().to_string())
+-        .unwrap_or_default();
+-
+-    let name = fs::read_to_string(&cmdline_path)
+-        .map(|s| s.trim().to_string())
+-        .unwrap_or_else(|_| format!("pid_{}", pid));
+-
+-    (name, path)
++    (String::new(), String::new()) /* ~ changed by cargo-mutants ~ */
+ }
+ 
+ #[cfg(test)]
+ mod tests {
+     use super::*;
+ 
+     #[test]
+     fn test_parse_port() {

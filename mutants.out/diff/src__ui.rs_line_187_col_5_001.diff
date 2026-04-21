@@ -1,0 +1,37 @@
+--- src/ui.rs
++++ replace centered_rect -> Rect with Default::default()
+@@ -179,33 +179,17 @@
+         .block(block)
+         .alignment(Alignment::Center);
+ 
+     frame.render_widget(Clear, area);
+     frame.render_widget(paragraph, area);
+ }
+ 
+ fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
+-    let popup_layout = Layout::default()
+-        .direction(Direction::Vertical)
+-        .constraints([
+-            Constraint::Percentage((100 - percent_y) / 2),
+-            Constraint::Percentage(percent_y),
+-            Constraint::Percentage((100 - percent_y) / 2),
+-        ])
+-        .split(r);
+-
+-    Layout::default()
+-        .direction(Direction::Horizontal)
+-        .constraints([
+-            Constraint::Percentage((100 - percent_x) / 2),
+-            Constraint::Percentage(percent_x),
+-            Constraint::Percentage((100 - percent_x) / 2),
+-        ])
+-        .split(popup_layout[1])[1]
++    Default::default() /* ~ changed by cargo-mutants ~ */
+ }
+ 
+ fn truncate(s: &str, max_len: usize) -> String {
+     if s.len() <= max_len {
+         s.to_string()
+     } else {
+         format!("{}...", &s[..max_len.saturating_sub(3)])
+     }

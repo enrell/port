@@ -1,0 +1,28 @@
+--- src/ports.rs
++++ replace get_open_ports -> io::Result<Vec<PortInfo>> with Ok(vec![Default::default()])
+@@ -6,24 +6,17 @@
+ pub struct PortInfo {
+     pub port: u16,
+     pub pid: u32,
+     pub process_name: String,
+     pub process_path: String,
+ }
+ 
+ pub fn get_open_ports() -> io::Result<Vec<PortInfo>> {
+-    let mut ports = Vec::new();
+-    let mut inode_pid_map = build_inode_pid_map()?;
+-
+-    parse_tcp_file("/proc/net/tcp", &mut ports, &mut inode_pid_map, false)?;
+-    let _ = parse_tcp_file("/proc/net/tcp6", &mut ports, &mut inode_pid_map, true);
+-
+-    ports.sort_by(|a, b| a.port.cmp(&b.port));
+-    Ok(ports)
++    Ok(vec![Default::default()]) /* ~ changed by cargo-mutants ~ */
+ }
+ 
+ fn build_inode_pid_map() -> io::Result<HashMap<u64, u32>> {
+     let mut map = HashMap::new();
+ 
+     for entry in fs::read_dir("/proc")? {
+         let entry = entry?;
+         let name = entry.file_name().to_string_lossy().to_string();

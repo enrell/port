@@ -1,0 +1,377 @@
+
+*** src/ports.rs:59:5: replace parse_tcp_file -> io::Result<()> with Ok(())
+
+*** mutation diff:
+--- src/ports.rs
++++ replace parse_tcp_file -> io::Result<()> with Ok(())
+@@ -51,59 +51,17 @@
+ }
+ 
+ fn parse_tcp_file(
+     path: &str,
+     ports: &mut Vec<PortInfo>,
+     inode_pid_map: &mut HashMap<u64, u32>,
+     _is_ipv6: bool,
+ ) -> io::Result<()> {
+-    let file = fs::File::open(path)?;
+-    let reader = BufReader::new(file);
+-
+-    for line in reader.lines().skip(1) {
+-        let line = line?;
+-        let parts: Vec<&str> = line.split_whitespace().collect();
+-        if parts.len() < 10 {
+-            continue;
+-        }
+-
+-        let _local_addr = parts[1];
+-        let _rem_addr = parts[2];
+-        let state = parts[3];
+-        let inode_str = parts[9];
+-
+-        if state != "0A" {
+-            continue;
+-        }
+-
+-        let port = parse_port(_local_addr);
+-
+-        let inode: u64 = match inode_str.parse() {
+-            Ok(n) => n,
+-            Err(_) => continue,
+-        };
+-
+-        if inode == 0 {
+-            continue;
+-        }
+-
+-        if let Some(&pid) = inode_pid_map.get(&inode) {
+-            let (name, path) = get_process_info(pid);
+-
+-            ports.push(PortInfo {
+-                port,
+-                pid,
+-                process_name: name,
+-                process_path: path,
+-            });
+-        }
+-    }
+-
+-    Ok(())
++    Ok(()) /* ~ changed by cargo-mutants ~ */
+ }
+ 
+ fn parse_port(hex_addr: &str) -> u16 {
+     if let Some(colon_pos) = hex_addr.rfind(':') {
+         let port_hex = &hex_addr[colon_pos + 1..];
+         if let Ok(port) = u16::from_str_radix(port_hex, 16) {
+             return port;
+         }
+
+
+*** /home/kokoro/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo test --no-run --verbose --package=port@0.1.0
+       Fresh unicode-ident v1.0.24
+       Fresh proc-macro2 v1.0.106
+       Fresh strsim v0.11.1
+       Fresh cfg-if v1.0.4
+       Fresh heck v0.5.0
+       Fresh ident_case v1.0.1
+       Fresh either v1.15.0
+       Fresh scopeguard v1.2.0
+       Fresh log v0.4.29
+       Fresh smallvec v1.15.1
+       Fresh utf8parse v0.2.2
+       Fresh lock_api v0.4.14
+       Fresh anstyle-parse v1.0.0
+       Fresh colorchoice v1.0.5
+       Fresh equivalent v1.0.2
+       Fresh linux-raw-sys v0.4.15
+       Fresh allocator-api2 v0.2.21
+       Fresh anstyle-query v1.1.5
+       Fresh libc v0.2.185
+       Fresh quote v1.0.45
+       Fresh rustversion v1.0.22
+       Fresh crossbeam-utils v0.8.21
+       Fresh bitflags v2.11.0
+       Fresh foldhash v0.1.5
+       Fresh is_terminal_polyfill v1.70.2
+       Fresh anstyle v1.0.14
+       Fresh itertools v0.13.0
+       Fresh indoc v2.0.7
+       Fresh unicode-segmentation v1.13.2
+       Fresh ryu v1.0.23
+       Fresh static_assertions v1.1.0
+       Fresh unicode-width v0.1.14
+       Fresh syn v2.0.117
+       Fresh errno v0.3.14
+       Fresh crossbeam-epoch v0.9.18
+       Fresh mio v1.2.0
+       Fresh parking_lot_core v0.9.12
+       Fresh rustix v0.38.44
+       Fresh castaway v0.2.4
+       Fresh hashbrown v0.15.5
+       Fresh anstream v1.0.0
+       Fresh clap_lex v1.1.0
+       Fresh itoa v1.0.18
+       Fresh paste v1.0.15
+       Fresh unicode-truncate v1.1.0
+       Fresh cassowary v0.3.0
+       Fresh once_cell v1.21.4
+       Fresh darling_core v0.23.0
+       Fresh signal-hook-registry v1.4.8
+       Fresh crossbeam-deque v0.8.6
+       Fresh parking_lot v0.12.5
+       Fresh strum_macros v0.26.4
+       Fresh clap_derive v4.6.0
+       Fresh clap_builder v4.6.0
+       Fresh compact_str v0.8.1
+       Fresh lru v0.12.5
+       Fresh darling_macro v0.23.0
+       Fresh signal-hook v0.3.18
+       Fresh rayon-core v1.13.0
+       Fresh strum v0.26.3
+       Fresh clap v4.6.0
+       Fresh signal-hook-mio v0.2.5
+       Fresh darling v0.23.0
+       Fresh rayon v1.12.0
+       Fresh crossterm v0.28.1
+       Fresh instability v0.3.12
+       Fresh sysinfo v0.30.13
+       Fresh ratatui v0.28.1
+       Dirty port v0.1.0 (/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp): the file `src/ports.rs` has changed (1776735892.391406633s, 1s after last build at 1776735891.847404715s)
+   Compiling port v0.1.0 (/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp)
+     Running `/home/kokoro/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc --crate-name port --edition=2021 src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --emit=dep-info,link -C embed-bitcode=no -C debuginfo=2 --test --check-cfg 'cfg(docsrs,test)' --check-cfg 'cfg(feature, values())' -C metadata=2252ddf7dcedca69 -C extra-filename=-e96da08cae1479da --out-dir /home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps -C incremental=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/incremental -L dependency=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps --extern clap=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libclap-1a0933b3d4b7ca77.rlib --extern crossterm=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libcrossterm-9c60b41a2f27ca84.rlib --extern libc=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/liblibc-5a1706567bedcee1.rlib --extern ratatui=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libratatui-cda975374c03fcad.rlib --extern sysinfo=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libsysinfo-7faff9ae12eff885.rlib`
+     Running `/home/kokoro/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc --crate-name port --edition=2021 src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type lib --emit=dep-info,metadata,link -C embed-bitcode=no -C debuginfo=2 --check-cfg 'cfg(docsrs,test)' --check-cfg 'cfg(feature, values())' -C metadata=2079e7455b219bb9 -C extra-filename=-2d6b9a71341d4c3a --out-dir /home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps -C incremental=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/incremental -L dependency=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps --extern clap=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libclap-1a0933b3d4b7ca77.rmeta --extern crossterm=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libcrossterm-9c60b41a2f27ca84.rmeta --extern libc=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/liblibc-5a1706567bedcee1.rmeta --extern ratatui=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libratatui-cda975374c03fcad.rmeta --extern sysinfo=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libsysinfo-7faff9ae12eff885.rmeta`
+warning: unused imports: `BufRead` and `BufReader`
+ --> src/ports.rs:3:21
+  |
+3 | use std::io::{self, BufRead, BufReader};
+  |                     ^^^^^^^  ^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `path`
+  --> src/ports.rs:54:5
+   |
+54 |     path: &str,
+   |     ^^^^ help: if this is intentional, prefix it with an underscore: `_path`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `ports`
+  --> src/ports.rs:55:5
+   |
+55 |     ports: &mut Vec<PortInfo>,
+   |     ^^^^^ help: if this is intentional, prefix it with an underscore: `_ports`
+
+warning: unused variable: `inode_pid_map`
+  --> src/ports.rs:56:5
+   |
+56 |     inode_pid_map: &mut HashMap<u64, u32>,
+   |     ^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_inode_pid_map`
+
+warning: function `parse_port` is never used
+  --> src/ports.rs:62:4
+   |
+62 | fn parse_port(hex_addr: &str) -> u16 {
+   |    ^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `get_process_info` is never used
+  --> src/ports.rs:72:4
+   |
+72 | fn get_process_info(pid: u32) -> (String, String) {
+   |    ^^^^^^^^^^^^^^^^
+
+warning: function `get_process_info` is never used
+  --> src/ports.rs:72:4
+   |
+72 | fn get_process_info(pid: u32) -> (String, String) {
+   |    ^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `port` (lib) generated 6 warnings (run `cargo fix --lib -p port` to apply 4 suggestions)
+     Running `/home/kokoro/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc --crate-name port --edition=2021 src/main.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --emit=dep-info,link -C embed-bitcode=no -C debuginfo=2 --test --check-cfg 'cfg(docsrs,test)' --check-cfg 'cfg(feature, values())' -C metadata=369196a560ef3dd3 -C extra-filename=-1bd188e359d4c6c8 --out-dir /home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps -C incremental=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/incremental -L dependency=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps --extern clap=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libclap-1a0933b3d4b7ca77.rlib --extern crossterm=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libcrossterm-9c60b41a2f27ca84.rlib --extern libc=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/liblibc-5a1706567bedcee1.rlib --extern port=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libport-2d6b9a71341d4c3a.rlib --extern ratatui=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libratatui-cda975374c03fcad.rlib --extern sysinfo=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libsysinfo-7faff9ae12eff885.rlib`
+warning: `port` (lib test) generated 5 warnings (4 duplicates)
+warning: `port` (bin "port" test) generated 5 warnings (5 duplicates)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.59s
+  Executable `/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/port-e96da08cae1479da`
+  Executable `/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/port-1bd188e359d4c6c8`
+
+*** result: Success
+
+*** /home/kokoro/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo test --verbose --package=port@0.1.0
+       Fresh unicode-ident v1.0.24
+       Fresh strsim v0.11.1
+       Fresh cfg-if v1.0.4
+       Fresh heck v0.5.0
+       Fresh either v1.15.0
+       Fresh proc-macro2 v1.0.106
+       Fresh ident_case v1.0.1
+       Fresh smallvec v1.15.1
+       Fresh scopeguard v1.2.0
+       Fresh utf8parse v0.2.2
+       Fresh log v0.4.29
+       Fresh allocator-api2 v0.2.21
+       Fresh is_terminal_polyfill v1.70.2
+       Fresh colorchoice v1.0.5
+       Fresh quote v1.0.45
+       Fresh libc v0.2.185
+       Fresh crossbeam-utils v0.8.21
+       Fresh rustversion v1.0.22
+       Fresh anstyle-parse v1.0.0
+       Fresh lock_api v0.4.14
+       Fresh linux-raw-sys v0.4.15
+       Fresh foldhash v0.1.5
+       Fresh equivalent v1.0.2
+       Fresh bitflags v2.11.0
+       Fresh anstyle-query v1.1.5
+       Fresh anstyle v1.0.14
+       Fresh syn v2.0.117
+       Fresh errno v0.3.14
+       Fresh crossbeam-epoch v0.9.18
+       Fresh parking_lot_core v0.9.12
+       Fresh mio v1.2.0
+       Fresh rustix v0.38.44
+       Fresh hashbrown v0.15.5
+       Fresh castaway v0.2.4
+       Fresh anstream v1.0.0
+       Fresh itertools v0.13.0
+       Fresh ryu v1.0.23
+       Fresh indoc v2.0.7
+       Fresh clap_lex v1.1.0
+       Fresh unicode-width v0.1.14
+       Fresh unicode-segmentation v1.13.2
+       Fresh signal-hook-registry v1.4.8
+       Fresh darling_core v0.23.0
+       Fresh crossbeam-deque v0.8.6
+       Fresh strum_macros v0.26.4
+       Fresh parking_lot v0.12.5
+       Fresh itoa v1.0.18
+       Fresh static_assertions v1.1.0
+       Fresh clap_builder v4.6.0
+       Fresh lru v0.12.5
+       Fresh paste v1.0.15
+       Fresh clap_derive v4.6.0
+       Fresh unicode-truncate v1.1.0
+       Fresh once_cell v1.21.4
+       Fresh cassowary v0.3.0
+       Fresh darling_macro v0.23.0
+       Fresh signal-hook v0.3.18
+       Fresh rayon-core v1.13.0
+       Fresh strum v0.26.3
+       Fresh compact_str v0.8.1
+       Fresh clap v4.6.0
+       Fresh signal-hook-mio v0.2.5
+       Fresh darling v0.23.0
+       Fresh rayon v1.12.0
+       Fresh crossterm v0.28.1
+       Fresh instability v0.3.12
+       Fresh sysinfo v0.30.13
+       Fresh ratatui v0.28.1
+warning: unused imports: `BufRead` and `BufReader`
+ --> src/ports.rs:3:21
+  |
+3 | use std::io::{self, BufRead, BufReader};
+  |                     ^^^^^^^  ^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `path`
+  --> src/ports.rs:54:5
+   |
+54 |     path: &str,
+   |     ^^^^ help: if this is intentional, prefix it with an underscore: `_path`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `ports`
+  --> src/ports.rs:55:5
+   |
+55 |     ports: &mut Vec<PortInfo>,
+   |     ^^^^^ help: if this is intentional, prefix it with an underscore: `_ports`
+
+warning: unused variable: `inode_pid_map`
+  --> src/ports.rs:56:5
+   |
+56 |     inode_pid_map: &mut HashMap<u64, u32>,
+   |     ^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_inode_pid_map`
+
+warning: function `parse_port` is never used
+  --> src/ports.rs:62:4
+   |
+62 | fn parse_port(hex_addr: &str) -> u16 {
+   |    ^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `get_process_info` is never used
+  --> src/ports.rs:72:4
+   |
+72 | fn get_process_info(pid: u32) -> (String, String) {
+   |    ^^^^^^^^^^^^^^^^
+
+warning: function `get_process_info` is never used
+  --> src/ports.rs:72:4
+   |
+72 | fn get_process_info(pid: u32) -> (String, String) {
+   |    ^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `port` (lib) generated 6 warnings (run `cargo fix --lib -p port` to apply 4 suggestions)
+warning: `port` (lib test) generated 5 warnings (4 duplicates)
+       Fresh port v0.1.0 (/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp)
+warning: `port` (bin "port" test) generated 5 warnings (5 duplicates)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s
+     Running `/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/port-e96da08cae1479da`
+
+running 15 tests
+test filter::tests::test_blocked_processes ... ok
+test filter::tests::test_blocked_ports ... ok
+test filter::tests::test_should_include_port ... ok
+test ports::tests::test_parse_port ... ok
+test process::tests::test_kill_nonexistent_process ... ok
+test events::tests::test_navigation ... ok
+test events::tests::test_confirm_mode_no ... ok
+test app::tests::test_mode_transitions ... ok
+test events::tests::test_search_mode_exit ... ok
+test app::tests::test_navigation ... ok
+test events::tests::test_search_mode_activation ... ok
+test events::tests::test_quit_with_q ... ok
+test events::tests::test_search_typing ... ok
+test events::tests::test_confirm_mode_yes ... ok
+test app::tests::test_search_filter ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running `/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/port-1bd188e359d4c6c8`
+
+running 15 tests
+test filter::tests::test_blocked_ports ... ok
+test filter::tests::test_blocked_processes ... ok
+test filter::tests::test_should_include_port ... ok
+test ports::tests::test_parse_port ... ok
+test process::tests::test_kill_nonexistent_process ... ok
+test events::tests::test_quit_with_q ... ok
+test events::tests::test_confirm_mode_no ... ok
+test app::tests::test_navigation ... ok
+test app::tests::test_search_filter ... ok
+test events::tests::test_search_mode_activation ... ok
+test events::tests::test_confirm_mode_yes ... ok
+test events::tests::test_search_mode_exit ... ok
+test events::tests::test_navigation ... ok
+test app::tests::test_mode_transitions ... ok
+test events::tests::test_search_typing ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+   Doc-tests port
+     Running `/home/kokoro/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustdoc --edition=2021 --crate-type lib --color auto --crate-name port --test src/lib.rs --test-run-directory /home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp --extern clap=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libclap-1a0933b3d4b7ca77.rlib --extern crossterm=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libcrossterm-9c60b41a2f27ca84.rlib --extern libc=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/liblibc-5a1706567bedcee1.rlib --extern port=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libport-2d6b9a71341d4c3a.rlib --extern ratatui=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libratatui-cda975374c03fcad.rlib --extern sysinfo=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps/libsysinfo-7faff9ae12eff885.rlib -L dependency=/home/kokoro/pip_tmp/cargo-mutants-port-po83ou.tmp/target/debug/deps -C embed-bitcode=no --check-cfg 'cfg(docsrs,test)' --check-cfg 'cfg(feature, values())' --error-format human`
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+*** result: Success

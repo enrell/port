@@ -1,0 +1,21 @@
+--- src/process.rs
++++ replace == with != in format_error
+@@ -7,17 +7,17 @@
+     } else {
+         Err(io::Error::last_os_error())
+     }
+ }
+ 
+ pub fn format_error(e: &io::Error) -> String {
+     if e.raw_os_error() == Some(libc::ESRCH) {
+         "Process not found (may have already exited)".to_string()
+-    } else if e.raw_os_error() == Some(libc::EPERM) {
++    } else if e.raw_os_error() != /* ~ changed by cargo-mutants ~ */ Some(libc::EPERM) {
+         "Permission denied".to_string()
+     } else {
+         e.to_string()
+     }
+ }
+ 
+ #[cfg(test)]
+ mod tests {
