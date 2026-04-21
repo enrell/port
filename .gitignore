@@ -10,3 +10,4 @@ target/
 
 # hermes plans (useful docs go to docs/)
 .hermes/
+mutation.out/
