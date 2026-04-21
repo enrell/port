@@ -14,8 +14,8 @@ A Rust CLI with a terminal UI (TUI) that lists open ports, filters out system se
 
 ## Features
 
-- **List open ports** — Shows TCP ports with process name and executable path
-- **Filter system ports** — Excludes SSH (22), HTTP (80/443), Docker containers, systemd, and other system services
+- **List open ports** — Shows all TCP ports with process name and executable path
+- **Kill by port** — CLI mode to directly kill a process on a given port
 - **Search** — Live filter by process name or port number
 - **Kill** — Enter to open confirmation modal, then confirm to force kill (SIGKILL)
 - **Keyboard-driven** — No mouse needed
@@ -40,8 +40,9 @@ install -Dm755 target/release/port ~/.local/bin/port
 ## Usage
 
 ```bash
-port              # Show user-owned ports only
-port --all        # Show all ports including system services
+port              # Start TUI (lists all open ports)
+port 3000         # Kill the process on port 3000
+port -t           # Explicit TUI mode (same as bare 'port')
 ```
 
 ### Controls

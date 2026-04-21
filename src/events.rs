@@ -116,7 +116,7 @@ mod tests {
 
  #[test]
  fn test_quit_with_q() {
- let mut app = App::new(false);
+ let mut app = App::new();
  let should_quit = handle_normal_mode(&mut app, make_char_key('q'));
  assert!(should_quit);
  assert!(app.should_quit);
@@ -124,7 +124,7 @@ mod tests {
 
  #[test]
  fn test_navigation() {
- let mut app = App::new(false);
+ let mut app = App::new();
  app.filtered = vec![0, 1, 2];
  app.selected = 0;
 
@@ -143,14 +143,14 @@ mod tests {
 
  #[test]
  fn test_search_mode_activation() {
- let mut app = App::new(false);
+ let mut app = App::new();
  handle_normal_mode(&mut app, make_char_key('/'));
  assert!(matches!(app.mode, crate::app::Mode::Search));
  }
 
  #[test]
  fn test_search_mode_exit() {
- let mut app = App::new(false);
+ let mut app = App::new();
  app.mode = crate::app::Mode::Search;
  handle_search_mode(&mut app, make_key(KeyCode::Esc));
  assert!(matches!(app.mode, crate::app::Mode::Normal));
@@ -158,7 +158,7 @@ mod tests {
 
  #[test]
  fn test_search_typing() {
- let mut app = App::new(false);
+ let mut app = App::new();
  app.mode = crate::app::Mode::Search;
 
  handle_search_mode(&mut app, make_char_key('t'));
@@ -171,7 +171,7 @@ mod tests {
 
  #[test]
  fn test_confirm_mode_yes() {
- let mut app = App::new(false);
+ let mut app = App::new();
  app.ports = vec![PortInfo {
  port: 8080,
  pid: 99999,
@@ -189,7 +189,7 @@ mod tests {
 
  #[test]
  fn test_confirm_mode_no() {
- let mut app = App::new(false);
+ let mut app = App::new();
  app.ports = vec![PortInfo {
             port: 8080,
             pid: 99999,

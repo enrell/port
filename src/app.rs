@@ -1,4 +1,3 @@
-use crate::filter::should_include_port;
 use crate::ports::{get_open_ports, PortInfo};
 use crate::process::{format_error, kill_process};
 
@@ -17,11 +16,10 @@ pub struct App {
  pub mode: Mode,
  pub message: Option<String>,
  pub should_quit: bool,
- pub show_all: bool,
 }
 
 impl App {
- pub fn new(show_all: bool) -> Self {
+ pub fn new() -> Self {
  let mut app = Self {
  ports: Vec::new(),
  filtered: Vec::new(),
@@ -30,7 +28,6 @@ impl App {
  mode: Mode::Normal,
  message: None,
  should_quit: false,
- show_all,
  };
  let _ = app.refresh_ports();
  app
@@ -39,14 +36,7 @@ impl App {
  pub fn refresh_ports(&mut self) -> Result<(), Box<dyn std::error::Error>> {
  match get_open_ports() {
  Ok(all_ports) => {
- if self.show_all {
  self.ports = all_ports;
- } else {
- self.ports = all_ports
- .into_iter()
- .filter(|p| should_include_port(p.port, &p.process_name))
- .collect();
- }
  self.apply_filter();
  Ok(())
  }
@@ -146,7 +136,7 @@ mod tests {
 
 #[test]
  fn test_navigation() {
- let mut app = App::new(false);
+ let mut app = App::new();
  app.ports = vec![
  create_test_port(3000, 100, "test1"),
  create_test_port(3001, 101, "test2"),
@@ -176,7 +166,7 @@ mod tests {
 
 #[test]
  fn test_search_filter() {
- let mut app = App::new(false);
+ let mut app = App::new();
  app.ports = vec![
  create_test_port(8080, 100, "firefox"),
  create_test_port(9999, 101, "chrome"),
@@ -196,7 +186,7 @@ mod tests {
 
 #[test]
  fn test_mode_transitions() {
- let mut app = App::new(false);
+ let mut app = App::new();
 
  assert!(matches!(app.mode, Mode::Normal));
 
@@ -215,26 +205,15 @@ mod tests {
  assert!(matches!(app.mode, Mode::Normal));
  }
 
- #[test]
  fn test_show_all_flag() {
- let mut app_filtered = App::new(false);
- app_filtered.ports = vec![
+ let mut app = App::new();
+ app.ports = vec![
  create_test_port(22, 100, "sshd"),
  create_test_port(9999, 101, "myapp"),
  ];
- app_filtered.filtered = vec![0, 1];
+ app.filtered = vec![0, 1];
 
- app_filtered.update_search("".to_string());
- assert_eq!(app_filtered.ports.len(), 2);
-
- let mut app_all = App::new(true);
- app_all.ports = vec![
- create_test_port(22, 100, "sshd"),
- create_test_port(9999, 101, "myapp"),
- ];
- app_all.filtered = vec![0, 1];
-
- assert_eq!(app_all.ports.len(), 2);
- assert!(app_all.show_all);
+ app.update_search("".to_string());
+ assert_eq!(app.ports.len(), 2);
  }
 }
