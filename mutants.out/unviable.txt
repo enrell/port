@@ -1,2 +1,0 @@
-src/ports.rs:14:5: replace get_open_ports -> io::Result<Vec<PortInfo>> with Ok(vec![Default::default()])
-src/ports.rs:14:5: replace get_open_ports -> io::Result<Vec<PortInfo>> with Ok(vec![Default::default()])
