@@ -23,8 +23,19 @@ pub fn render(frame: &mut Frame, app: &App) {
     render_table(frame, app, chunks[1]);
     render_footer(frame, app, chunks[2]);
 
-    if let Mode::ConfirmKill { pid, name, container_id: _ } = &app.mode {
-        render_confirm_modal(frame, pid, name);
+    match &app.mode {
+        Mode::ConfirmKill {
+            pid,
+            name,
+            container_id: _,
+        } => {
+            render_confirm_modal(frame, pid, name);
+        }
+        _ => {
+            if let Some(msg) = &app.message {
+                render_message_popup(frame, msg);
+            }
+        }
     }
 }
 
@@ -55,12 +66,11 @@ fn render_header(frame: &mut Frame, app: &App, area: Rect) {
 }
 
 fn render_table(frame: &mut Frame, app: &App, area: Rect) {
-    let header = Row::new(vec!["PORT", "PID", "NAME", "PATH"])
-        .style(
-            Style::default()
-                .fg(Color::Cyan)
-                .add_modifier(Modifier::BOLD),
-        );
+    let header = Row::new(vec!["PORT", "PID", "NAME", "PATH"]).style(
+        Style::default()
+            .fg(Color::Cyan)
+            .add_modifier(Modifier::BOLD),
+    );
 
     let rows: Vec<Row> = app
         .filtered
@@ -87,22 +97,21 @@ fn render_table(frame: &mut Frame, app: &App, area: Rect) {
         })
         .collect();
 
-    let table = Table::new(rows, [
-        Constraint::Length(8),
-        Constraint::Length(8),
-        Constraint::Min(15),
-        Constraint::Min(35),
-    ])
+    let table = Table::new(
+        rows,
+        [
+            Constraint::Length(8),
+            Constraint::Length(8),
+            Constraint::Min(15),
+            Constraint::Min(35),
+        ],
+    )
     .header(header)
-    .block(
-        Block::default()
-            .borders(Borders::ALL)
-            .title(format!(
-                "Open Ports (showing {} of {})",
-                app.filtered.len(),
-                app.ports.len()
-            )),
-    );
+    .block(Block::default().borders(Borders::ALL).title(format!(
+        "Open Ports (showing {} of {})",
+        app.filtered.len(),
+        app.ports.len()
+    )));
 
     frame.render_widget(table, area);
 
@@ -121,20 +130,6 @@ fn render_table(frame: &mut Frame, app: &App, area: Rect) {
             let _ = offset;
         }
     }
-
-    if let Some(msg) = &app.message {
-        let area = centered_rect(60, 20, frame.area());
-        let popup = Paragraph::new(msg.as_str())
-            .block(
-                Block::default()
-                    .borders(Borders::ALL)
-                    .border_style(Style::default().fg(Color::Yellow)),
-            )
-            .alignment(Alignment::Center)
-            .wrap(Wrap { trim: true });
-        frame.render_widget(Clear, area);
-        frame.render_widget(popup, area);
-    }
 }
 
 fn render_footer(frame: &mut Frame, app: &App, area: Rect) {
@@ -149,6 +144,27 @@ fn render_footer(frame: &mut Frame, app: &App, area: Rect) {
         .alignment(Alignment::Center);
 
     frame.render_widget(footer, area);
+}
+
+fn render_message_popup(frame: &mut Frame, msg: &str) {
+    let area = centered_rect(60, 20, frame.area());
+    let popup = Paragraph::new(Text::from(vec![
+        Line::from(msg),
+        Line::from(""),
+        Line::from(Span::styled(
+            "Press any key to continue",
+            Style::default().fg(Color::Gray),
+        )),
+    ]))
+    .block(
+        Block::default()
+            .borders(Borders::ALL)
+            .border_style(Style::default().fg(Color::Yellow)),
+    )
+    .alignment(Alignment::Center)
+    .wrap(Wrap { trim: true });
+    frame.render_widget(Clear, area);
+    frame.render_widget(popup, area);
 }
 
 fn render_confirm_modal(frame: &mut Frame, pid: &u32, name: &str) {

@@ -17,7 +17,10 @@ pub fn kill_docker_container(container_id: &str) -> io::Result<()> {
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
-        return Err(io::Error::new(io::ErrorKind::Other, format!("docker stop failed: {}", stderr)));
+        return Err(io::Error::new(
+            io::ErrorKind::Other,
+            format!("docker stop failed: {}", stderr),
+        ));
     }
 
     Ok(())

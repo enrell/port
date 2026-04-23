@@ -1,12 +1,12 @@
-use std::io;
-use std::process::ExitCode;
+use clap::Parser;
 use crossterm::{
     terminal::{self, EnterAlternateScreen, LeaveAlternateScreen},
     ExecutableCommand,
 };
 use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
-use clap::Parser;
+use std::io;
+use std::process::ExitCode;
 
 mod app;
 mod events;
@@ -62,6 +62,7 @@ fn main() -> io::Result<ExitCode> {
     let mut app = App::new();
 
     loop {
+        app.tick();
         terminal.draw(|frame| ui::render(frame, &app))?;
 
         if events::handle(&mut app)? {
@@ -86,5 +87,8 @@ fn kill_by_port(port: u16) -> io::Result<()> {
         }
         return process::kill_process(port_info.pid);
     }
-    Err(io::Error::new(io::ErrorKind::NotFound, format!("No process found on port {}", port)))
+    Err(io::Error::new(
+        io::ErrorKind::NotFound,
+        format!("No process found on port {}", port),
+    ))
 }

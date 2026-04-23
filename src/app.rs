@@ -1,6 +1,9 @@
 use crate::ports::{get_open_ports, PortInfo};
-use crate::process::{format_error, kill_process};
 use crate::process::kill_docker_container;
+use crate::process::{format_error, kill_process};
+use std::time::{Duration, Instant};
+
+const MESSAGE_TIMEOUT: Duration = Duration::from_secs(2);
 
 #[derive(Debug, Clone)]
 pub enum Mode {
@@ -14,40 +17,42 @@ pub enum Mode {
 }
 
 pub struct App {
- pub ports: Vec<PortInfo>,
- pub filtered: Vec<usize>,
- pub selected: usize,
- pub search_query: String,
- pub mode: Mode,
- pub message: Option<String>,
- pub should_quit: bool,
+    pub ports: Vec<PortInfo>,
+    pub filtered: Vec<usize>,
+    pub selected: usize,
+    pub search_query: String,
+    pub mode: Mode,
+    pub message: Option<String>,
+    pub message_expires_at: Option<Instant>,
+    pub should_quit: bool,
 }
 
 impl App {
- pub fn new() -> Self {
- let mut app = Self {
- ports: Vec::new(),
- filtered: Vec::new(),
- selected: 0,
- search_query: String::new(),
- mode: Mode::Normal,
- message: None,
- should_quit: false,
- };
- let _ = app.refresh_ports();
- app
- }
+    pub fn new() -> Self {
+        let mut app = Self {
+            ports: Vec::new(),
+            filtered: Vec::new(),
+            selected: 0,
+            search_query: String::new(),
+            mode: Mode::Normal,
+            message: None,
+            message_expires_at: None,
+            should_quit: false,
+        };
+        let _ = app.refresh_ports();
+        app
+    }
 
- pub fn refresh_ports(&mut self) -> Result<(), Box<dyn std::error::Error>> {
- match get_open_ports() {
- Ok(all_ports) => {
- self.ports = all_ports;
- self.apply_filter();
- Ok(())
- }
- Err(e) => Err(Box::new(e)),
- }
- }
+    pub fn refresh_ports(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        match get_open_ports() {
+            Ok(all_ports) => {
+                self.ports = all_ports;
+                self.apply_filter();
+                Ok(())
+            }
+            Err(e) => Err(Box::new(e)),
+        }
+    }
 
     fn apply_filter(&mut self) {
         self.filtered = if self.search_query.is_empty() {
@@ -108,33 +113,56 @@ impl App {
     }
 
     pub fn execute_kill(&mut self) {
-        if let Mode::ConfirmKill { pid, name: _, container_id } = &self.mode {
-            let container_id = container_id.clone();
-            let result = if let Some(ref id) = container_id {
-                kill_docker_container(id)
-            } else {
-                kill_process(*pid)
-            };
+        let (pid, container_id) = match &self.mode {
+            Mode::ConfirmKill {
+                pid,
+                name: _,
+                container_id,
+            } => (*pid, container_id.clone()),
+            _ => return,
+        };
 
-            match result {
-                Ok(_) => {
-                    self.message = Some(if container_id.is_some() {
-                        format!("Stopped container on port")
-                    } else {
-                        format!("Killed process {}", pid)
-                    });
-                    let _ = self.refresh_ports();
-                }
-                Err(e) => {
-                    self.message = Some(format_error(&e));
-                }
+        let result = if let Some(ref id) = container_id {
+            kill_docker_container(id)
+        } else {
+            kill_process(pid)
+        };
+
+        match result {
+            Ok(_) => {
+                self.show_message(if container_id.is_some() {
+                    "Stopped container".to_string()
+                } else {
+                    format!("Killed process {}", pid)
+                });
+                let _ = self.refresh_ports();
+            }
+            Err(e) => {
+                self.show_message(format_error(&e));
             }
         }
+
         self.mode = Mode::Normal;
     }
 
     pub fn cancel_modal(&mut self) {
         self.mode = Mode::Normal;
+    }
+
+    pub fn tick(&mut self) {
+        if matches!(self.message_expires_at, Some(deadline) if Instant::now() >= deadline) {
+            self.clear_message();
+        }
+    }
+
+    pub fn clear_message(&mut self) {
+        self.message = None;
+        self.message_expires_at = None;
+    }
+
+    fn show_message(&mut self, message: String) {
+        self.message = Some(message);
+        self.message_expires_at = Some(Instant::now() + MESSAGE_TIMEOUT);
     }
 }
 
@@ -152,16 +180,16 @@ mod tests {
         }
     }
 
-#[test]
- fn test_navigation() {
- let mut app = App::new();
- app.ports = vec![
- create_test_port(3000, 100, "test1"),
- create_test_port(3001, 101, "test2"),
- create_test_port(3002, 102, "test3"),
- ];
- app.filtered = vec![0, 1, 2];
- app.selected = 0;
+    #[test]
+    fn test_navigation() {
+        let mut app = App::new();
+        app.ports = vec![
+            create_test_port(3000, 100, "test1"),
+            create_test_port(3001, 101, "test2"),
+            create_test_port(3002, 102, "test3"),
+        ];
+        app.filtered = vec![0, 1, 2];
+        app.selected = 0;
 
         app.next();
         assert_eq!(app.selected, 1);
@@ -182,15 +210,15 @@ mod tests {
         assert_eq!(app.selected, 0);
     }
 
-#[test]
- fn test_search_filter() {
- let mut app = App::new();
- app.ports = vec![
- create_test_port(8080, 100, "firefox"),
- create_test_port(9999, 101, "chrome"),
- create_test_port(7777, 102, "firefox"),
- ];
- app.filtered = vec![0, 1, 2];
+    #[test]
+    fn test_search_filter() {
+        let mut app = App::new();
+        app.ports = vec![
+            create_test_port(8080, 100, "firefox"),
+            create_test_port(9999, 101, "chrome"),
+            create_test_port(7777, 102, "firefox"),
+        ];
+        app.filtered = vec![0, 1, 2];
 
         app.update_search("fire".to_string());
         assert_eq!(app.filtered.len(), 2);
@@ -202,11 +230,11 @@ mod tests {
         assert_eq!(app.filtered.len(), 3);
     }
 
-#[test]
- fn test_mode_transitions() {
- let mut app = App::new();
+    #[test]
+    fn test_mode_transitions() {
+        let mut app = App::new();
 
- assert!(matches!(app.mode, Mode::Normal));
+        assert!(matches!(app.mode, Mode::Normal));
 
         app.enter_search_mode();
         assert!(matches!(app.mode, Mode::Search));
@@ -219,7 +247,19 @@ mod tests {
         app.confirm_kill();
         assert!(matches!(app.mode, Mode::ConfirmKill { pid: 100, .. }));
 
- app.cancel_modal();
- assert!(matches!(app.mode, Mode::Normal));
- }
+        app.cancel_modal();
+        assert!(matches!(app.mode, Mode::Normal));
+    }
+
+    #[test]
+    fn test_message_timeout_clears_popup() {
+        let mut app = App::new();
+        app.message = Some("Killed process 100".to_string());
+        app.message_expires_at = Some(Instant::now() - Duration::from_millis(1));
+
+        app.tick();
+
+        assert!(app.message.is_none());
+        assert!(app.message_expires_at.is_none());
+    }
 }

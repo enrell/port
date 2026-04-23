@@ -1,4 +1,6 @@
-const BLOCKED_PORTS: &[u16] = &[22, 80, 443, 53, 3306, 5432, 6379, 8080, 3000, 5000, 8000, 9000];
+const BLOCKED_PORTS: &[u16] = &[
+    22, 80, 443, 53, 3306, 5432, 6379, 8080, 3000, 5000, 8000, 9000,
+];
 
 const BLOCKED_PROCESSES: &[&str] = &[
     "systemd",
@@ -17,7 +19,9 @@ pub fn is_blocked_port(port: u16) -> bool {
 
 pub fn is_blocked_process(name: &str) -> bool {
     let name_lower = name.to_lowercase();
-    BLOCKED_PROCESSES.iter().any(|blocked| name_lower.contains(blocked))
+    BLOCKED_PROCESSES
+        .iter()
+        .any(|blocked| name_lower.contains(blocked))
 }
 
 pub fn should_include_port(port: u16, process_name: &str) -> bool {

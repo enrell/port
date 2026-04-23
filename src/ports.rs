@@ -25,11 +25,9 @@ pub fn get_open_ports() -> io::Result<Vec<PortInfo>> {
     let mut docker_ports = parse_docker_ports()?;
     ports.append(&mut docker_ports);
 
-    ports.sort_by(|a, b| {
-        match a.port.cmp(&b.port) {
-            std::cmp::Ordering::Equal => b.pid.cmp(&a.pid),
-            other => other,
-        }
+    ports.sort_by(|a, b| match a.port.cmp(&b.port) {
+        std::cmp::Ordering::Equal => b.pid.cmp(&a.pid),
+        other => other,
     });
     ports.dedup_by(|a, b| a.port == b.port);
     Ok(ports)
@@ -49,7 +47,10 @@ fn build_inode_pid_map() -> io::Result<HashMap<u64, u32>> {
                     if let Ok(link) = fs::read_link(fd_entry.path()) {
                         let link_str = link.to_string_lossy();
                         if link_str.starts_with("socket:[") {
-                            if let Some(inode) = link_str.strip_prefix("socket:[").and_then(|s| s.strip_suffix("]")) {
+                            if let Some(inode) = link_str
+                                .strip_prefix("socket:[")
+                                .and_then(|s| s.strip_suffix("]"))
+                            {
                                 if let Ok(inode_num) = inode.parse::<u64>() {
                                     map.insert(inode_num, pid);
                                 }
@@ -251,7 +252,8 @@ fn parse_ss_process_info(parts: &[&str]) -> (u32, String) {
     for part in parts {
         if part.starts_with("pid=") {
             if let Ok(pid) = part[4..].split(',').next().unwrap_or("0").parse() {
-                let name = parts.iter()
+                let name = parts
+                    .iter()
                     .find(|p| p.starts_with("users:("))
                     .and_then(|s| {
                         let s = s.strip_prefix("users:(\"")?;
