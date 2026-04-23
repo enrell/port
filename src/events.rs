@@ -1,4 +1,4 @@
-use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
+use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyModifiers};
 use std::io;
 
 use crate::app::{App, Mode};
@@ -6,9 +6,7 @@ use crate::app::{App, Mode};
 pub fn handle(app: &mut App) -> io::Result<bool> {
     if event::poll(std::time::Duration::from_millis(100))? {
         if let Event::Key(key) = event::read()? {
-            if key.kind == KeyEventKind::Press {
-                return Ok(handle_key_event(app, key));
-            }
+            return Ok(handle_key_event(app, key));
         }
     }
     Ok(false)
