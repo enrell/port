@@ -21,16 +21,24 @@ use ports::get_open_ports;
 #[derive(Parser)]
 #[command(name = "port")]
 #[command(about = "TUI port manager for Linux")]
+#[command(disable_version_flag = true)]
 struct Args {
     #[arg(short, long)]
     tui: bool,
     #[arg(short, long)]
     list: bool,
+    #[arg(short = 'v', long = "version", action = clap::ArgAction::SetTrue)]
+    version: bool,
     port: Option<u16>,
 }
 
 fn main() -> io::Result<ExitCode> {
     let args = Args::parse();
+
+    if args.version {
+        println!("port {}", env!("CARGO_PKG_VERSION"));
+        return Ok(ExitCode::SUCCESS);
+    }
 
     if let Some(port) = args.port {
         if let Err(e) = kill_by_port(port) {

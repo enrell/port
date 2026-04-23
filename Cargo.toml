@@ -1,6 +1,6 @@
 [package]
 name = "port"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 description = "A TUI tool for managing open network ports on Linux"
 repository = "git@github.com:enrell/port.git"
@@ -39,4 +39,3 @@ cargo-dist-version = "0.24.0"
 ci = "github"
 # Where to host releases
 hosting = "github"
-

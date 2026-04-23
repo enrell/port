@@ -43,6 +43,8 @@ install -Dm755 target/release/port ~/.local/bin/port
 port              # Start TUI (lists all open ports)
 port 3000         # Kill the process on port 3000
 port -t           # Explicit TUI mode (same as bare 'port')
+port -v           # Show the installed version
+port --version    # Show the installed version
 ```
 
 ### Controls
